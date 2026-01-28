@@ -1,11 +1,13 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { MapContainer, TileLayer, CircleMarker, Popup, useMap } from 'react-leaflet'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Button } from '@/components/ui/button'
 import type { Signal, SignalCluster } from '@/lib/types'
 import { h3ToLocation } from '@/lib/h3Service'
-import { MapPin, Planet, Globe, Stack } from '@phosphor-icons/react'
+import { MapPin, Planet, Globe, Stack, Fire } from '@phosphor-icons/react'
+import { HeatMapLayer } from '@/components/HeatMapLayer'
 import 'leaflet/dist/leaflet.css'
 
 interface SatelliteMapViewProps {
@@ -57,6 +59,9 @@ const CATEGORY_COLORS: Record<string, string> = {
 }
 
 export function SatelliteMapView({ signals, clusters = [], onSignalClick, onClusterClick }: SatelliteMapViewProps) {
+  const [showHeatMap, setShowHeatMap] = useState(true)
+  const [heatIntensity, setHeatIntensity] = useState<'low' | 'medium' | 'high'>('medium')
+
   const signalsWithLocations = useMemo<SignalWithLocation[]>(() => {
     return signals.map(signal => {
       const h3Location = h3ToLocation(signal.h3Cell)
@@ -99,6 +104,14 @@ export function SatelliteMapView({ signals, clusters = [], onSignalClick, onClus
         </div>
         
         <div className="flex items-center gap-3">
+          <Button
+            variant={showHeatMap ? "default" : "outline"}
+            size="sm"
+            onClick={() => setShowHeatMap(!showHeatMap)}
+          >
+            <Fire size={16} className="mr-1.5" />
+            Heat Map
+          </Button>
           <Badge variant="outline" className="gap-1.5">
             <Globe size={16} />
             Satellite View
@@ -119,6 +132,13 @@ export function SatelliteMapView({ signals, clusters = [], onSignalClick, onClus
           />
           
           <MapUpdater signalsWithLocations={signalsWithLocations} />
+          
+          {showHeatMap && (
+            <HeatMapLayer 
+              signals={signalsWithLocations} 
+              intensity={heatIntensity}
+            />
+          )}
           
           {signalsWithLocations.map((signal) => {
             const color = getCategoryColor(signal.category)
@@ -208,10 +228,57 @@ export function SatelliteMapView({ signals, clusters = [], onSignalClick, onClus
             )
           })}
         </MapContainer>
+
+        {showHeatMap && (
+          <div className="absolute bottom-4 right-4 z-[1000] bg-card/90 backdrop-blur-sm p-3 rounded-lg border border-border">
+            <div className="text-xs font-semibold mb-2">Heat Map Intensity</div>
+            <div className="flex flex-col gap-2">
+              <Button
+                size="sm"
+                variant={heatIntensity === 'low' ? 'default' : 'outline'}
+                onClick={() => setHeatIntensity('low')}
+                className="text-xs"
+              >
+                Low
+              </Button>
+              <Button
+                size="sm"
+                variant={heatIntensity === 'medium' ? 'default' : 'outline'}
+                onClick={() => setHeatIntensity('medium')}
+                className="text-xs"
+              >
+                Medium
+              </Button>
+              <Button
+                size="sm"
+                variant={heatIntensity === 'high' ? 'default' : 'outline'}
+                onClick={() => setHeatIntensity('high')}
+                className="text-xs"
+              >
+                High
+              </Button>
+            </div>
+            <div className="mt-3 pt-3 border-t border-border">
+              <div className="text-xs font-semibold mb-2">Density Scale</div>
+              <div className="flex items-center gap-1 h-4 rounded overflow-hidden">
+                <div className="flex-1 h-full" style={{ backgroundColor: '#0000ff' }} />
+                <div className="flex-1 h-full" style={{ backgroundColor: '#00ffff' }} />
+                <div className="flex-1 h-full" style={{ backgroundColor: '#00ff00' }} />
+                <div className="flex-1 h-full" style={{ backgroundColor: '#ffff00' }} />
+                <div className="flex-1 h-full" style={{ backgroundColor: '#ff8800' }} />
+                <div className="flex-1 h-full" style={{ backgroundColor: '#ff0000' }} />
+              </div>
+              <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
+                <span>Low</span>
+                <span>High</span>
+              </div>
+            </div>
+          </div>
+        )}
         
-        <div className="absolute bottom-4 left-4 z-[1000] bg-card/90 backdrop-blur-sm p-3 rounded-lg border border-border">
+        <div className="absolute bottom-4 left-4 z-[1000] bg-card/90 backdrop-blur-sm p-3 rounded-lg border border-border max-w-xs">
           <div className="text-xs font-semibold mb-2">Signal Distribution</div>
-          <div className="space-y-1">
+          <div className="space-y-1 max-h-48 overflow-y-auto">
             {Object.entries(
               signals.reduce((acc, s) => {
                 acc[s.category] = (acc[s.category] || 0) + 1
@@ -220,11 +287,11 @@ export function SatelliteMapView({ signals, clusters = [], onSignalClick, onClus
             ).map(([category, count]) => (
               <div key={category} className="flex items-center gap-2 text-xs">
                 <div
-                  className="w-3 h-3 rounded-full"
+                  className="w-3 h-3 rounded-full flex-shrink-0"
                   style={{ backgroundColor: getCategoryColor(category) }}
                 />
-                <span className="capitalize">{category}</span>
-                <span className="font-mono ml-auto">{count}</span>
+                <span className="capitalize flex-1 truncate">{category}</span>
+                <span className="font-mono">{count}</span>
               </div>
             ))}
           </div>
@@ -233,6 +300,12 @@ export function SatelliteMapView({ signals, clusters = [], onSignalClick, onClus
         <div className="absolute top-4 right-4 z-[1000] bg-card/90 backdrop-blur-sm p-2 rounded-lg border border-border">
           <div className="text-xs font-semibold mb-1">Total Signals</div>
           <div className="text-2xl font-mono font-bold">{signals.length}</div>
+          {showHeatMap && (
+            <div className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+              <Fire size={12} weight="fill" className="text-orange-500" />
+              Heat map active
+            </div>
+          )}
         </div>
       </Card>
     </div>
