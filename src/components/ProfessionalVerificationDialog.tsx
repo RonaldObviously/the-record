@@ -34,6 +34,7 @@ import {
   MapPin,
   Users,
 } from '@phosphor-icons/react'
+import { ProfessionalVerificationExplainer } from './ProfessionalVerificationExplainer'
 
 interface ProfessionalVerificationDialogProps {
   open: boolean
@@ -88,7 +89,7 @@ export function ProfessionalVerificationDialog({
     )
     
     setCredentials([...credentials, credential])
-    toast.info('Document submitted for review. Manual verification may take 1-3 business days.')
+    toast.info('Document submitted to decentralized validator network. Review takes 1-3 days.')
   }
 
   const handleComplete = () => {
@@ -131,8 +132,9 @@ export function ProfessionalVerificationDialog({
               <Certificate size={24} className="text-accent" />
               Professional Verification
             </DialogTitle>
-            <DialogDescription>
-              Connect as a verified professional to contribute with enhanced credibility
+            <DialogDescription className="flex items-center justify-between gap-4">
+              <span>Connect as a verified professional to contribute with enhanced credibility</span>
+              <ProfessionalVerificationExplainer />
             </DialogDescription>
           </DialogHeader>
         </div>
@@ -265,10 +267,14 @@ export function ProfessionalVerificationDialog({
                         Employer Letter
                       </Button>
                     </div>
-                    <p className="text-xs text-muted-foreground">
-                      Documents are hashed and reviewed by decentralized validators. Your personal information 
-                      is never stored on-chain.
-                    </p>
+                    <div className="bg-accent/10 border border-accent/30 p-3 rounded-lg">
+                      <p className="text-xs text-muted-foreground leading-relaxed">
+                        <strong className="text-foreground">Decentralized Review:</strong> Documents are hashed 
+                        (SHA-256) and encrypted on IPFS. A random selection of 5 validators from your professional 
+                        field review the credentials. 4 out of 5 must approve. Validators stake influence and lose 
+                        it if they approve fraudulent credentials. No central authority controls this process.
+                      </p>
+                    </div>
                   </div>
 
                   {credentials.length > 0 && (

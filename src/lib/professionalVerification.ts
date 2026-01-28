@@ -325,4 +325,90 @@ export const PROFESSIONAL_VERIFICATION_SAFEGUARDS = {
     description: 'No single professional type can dominate a bubble',
     implementation: 'gini-coefficient-enforcement',
   },
+  decentralizedValidation: {
+    description: 'No central authority approves credentials',
+    implementation: 'random-validator-selection-with-stake',
+  },
+  challengePeriod: {
+    description: '7-day public challenge period for all new credentials',
+    implementation: 'community-fraud-reporting',
+  },
+}
+
+export interface ValidatorReview {
+  validatorId: string
+  credentialId: string
+  approved: boolean
+  reviewedAt: Date
+  comments?: string
+  stakeAmount: number
+}
+
+export interface DecentralizedReviewProcess {
+  credentialId: string
+  status: 'pending' | 'under-review' | 'approved' | 'rejected' | 'challenged'
+  selectedValidators: string[]
+  reviews: ValidatorReview[]
+  consensusReached: boolean
+  challengePeriodEnds?: Date
+  finalDecision?: 'approved' | 'rejected'
+}
+
+export function selectRandomValidators(
+  role: ProfessionalRole,
+  availableValidators: UserAccount[],
+  count: number = 5
+): string[] {
+  const eligibleValidators = availableValidators.filter(v => 
+    v.humanityScore >= 80 && 
+    v.influence >= 500 &&
+    v.professionalProfile?.role === role
+  )
+  
+  const shuffled = [...eligibleValidators].sort(() => Math.random() - 0.5)
+  
+  return shuffled.slice(0, count).map(v => v.id)
+}
+
+export function checkValidationConsensus(reviews: ValidatorReview[]): {
+  consensusReached: boolean
+  decision: 'approved' | 'rejected' | 'pending'
+} {
+  const totalReviews = reviews.length
+  const approvals = reviews.filter(r => r.approved).length
+  
+  if (totalReviews < 5) {
+    return { consensusReached: false, decision: 'pending' }
+  }
+  
+  if (approvals >= 4) {
+    return { consensusReached: true, decision: 'approved' }
+  }
+  
+  if (totalReviews - approvals >= 2) {
+    return { consensusReached: true, decision: 'rejected' }
+  }
+  
+  return { consensusReached: false, decision: 'pending' }
+}
+
+export function calculateValidatorReward(
+  reviews: ValidatorReview[],
+  finalDecision: 'approved' | 'rejected',
+  baseReward: number = 50
+): Map<string, number> {
+  const rewards = new Map<string, number>()
+  
+  for (const review of reviews) {
+    const correctDecision = (review.approved && finalDecision === 'approved') ||
+                           (!review.approved && finalDecision === 'rejected')
+    
+    if (correctDecision) {
+      rewards.set(review.validatorId, baseReward)
+    } else {
+      rewards.set(review.validatorId, -review.stakeAmount)
+    }
+  }
+  
+  return rewards
 }
