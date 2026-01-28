@@ -1,220 +1,177 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState } from 'react'
 import { useKV } from '@github/spark/hooks'
-import { BubbleMap } from '@/components/BubbleMap'
-import { BubbleDashboard } from '@/components/BubbleDashboard'
-import { Header } from '@/components/Header'
-import { MetaAlertPanel } from '@/components/MetaAlertPanel'
-import { SystemMonitoring } from '@/components/SystemMonitoring'
-import { Globe3D } from '@/components/Globe3D'
-import { WelcomeDialog } from '@/components/WelcomeDialog'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
-import { ChartLine, Globe, MapTrifold, ArrowsClockwise } from '@phosphor-icons/react'
+import { Plus } from '@phosphor-icons/react'
+import { TodayView } from '@/components/TodayView'
+import { WeekView } from '@/components/WeekView'
+import { AnalyticsView } from '@/components/AnalyticsView'
+import { TaskBacklog } from '@/components/TaskBacklog'
+import { CreateBlockDialog } from '@/components/CreateBlockDialog'
+import type { TimeBlock, Task, DailyReflection } from '@/lib/types'
 import { toast } from 'sonner'
-import { 
-  generateSeedBubbles, 
-  generateSeedProblems, 
-  generateSeedProposals, 
-  generateSeedBlackBoxEntries,
-  generateSeedMetaAlerts
-} from '@/lib/seedData'
-import type { Bubble, Problem, Proposal, BlackBoxEntry, MetaAlert } from '@/lib/types'
 
 function App() {
-  const [selectedBubble, setSelectedBubble] = useState<Bubble | null>(null)
-  const [showSystemMonitor, setShowSystemMonitor] = useState(false)
-  const [viewMode, setViewMode] = useState<'map' | 'globe'>('globe')
-  const [bubbles, setBubbles] = useKV<Bubble[]>('bubbles', [])
-  const [problems, setProblems] = useKV<Problem[]>('problems', [])
-  const [proposals, setProposals] = useKV<Proposal[]>('proposals', [])
-  const [blackBox, setBlackBox] = useKV<BlackBoxEntry[]>('blackbox', [])
-  const [metaAlerts, setMetaAlerts] = useKV<MetaAlert[]>('meta-alerts', [])
-  const [initialized, setInitialized] = useKV<boolean>('system-initialized', false)
-  const [hasSeenWelcome, setHasSeenWelcome] = useKV<boolean>('has-seen-welcome', false)
-  const [showWelcome, setShowWelcome] = useState(false)
+  const [blocks, setBlocks] = useKV<TimeBlock[]>('time-blocks', [])
+  const [tasks, setTasks] = useKV<Task[]>('tasks', [])
+  const [reflections, setReflections] = useKV<DailyReflection[]>('reflections', [])
+  const [activeBlockId, setActiveBlockId] = useKV<string | null>('active-block-id', null)
+  const [showCreateDialog, setShowCreateDialog] = useState(false)
+  const [currentTab, setCurrentTab] = useState('today')
 
-  const safeBubbles = Array.isArray(bubbles) ? bubbles : []
-  const safeProblems = Array.isArray(problems) ? problems : []
-  const safeProposals = Array.isArray(proposals) ? proposals : []
-  const safeBlackBox = Array.isArray(blackBox) ? blackBox : []
-  const safeMetaAlerts = Array.isArray(metaAlerts) ? metaAlerts : []
+  const safeBlocks = Array.isArray(blocks) ? blocks : []
+  const safeTasks = Array.isArray(tasks) ? tasks : []
+  const safeReflections = Array.isArray(reflections) ? reflections : []
 
-  const bubblesWithStats = useMemo(() => {
-    return safeBubbles.map(bubble => ({
-      ...bubble,
-      problemCount: safeProblems.filter(p => p.bubbleId === bubble.id).length,
-      proposalCount: safeProposals.filter(p => p.bubbleId === bubble.id).length,
-      activeAlerts: safeMetaAlerts.filter(a => a.bubbleId === bubble.id && a.severity !== 'low').length
-    }))
-  }, [safeBubbles, safeProblems, safeProposals, safeMetaAlerts])
+  const handleCreateBlock = (block: TimeBlock) => {
+    setBlocks((current) => [...(current || []), block])
+    toast.success('Time block created')
+  }
 
-  useEffect(() => {
-    if (!initialized && safeBubbles.length === 0) {
-      const seedBubbles = generateSeedBubbles()
-      setBubbles(seedBubbles)
+  const handleUpdateBlock = (blockId: string, updates: Partial<TimeBlock>) => {
+    setBlocks((current) =>
+      (current || []).map((block) => (block.id === blockId ? { ...block, ...updates } : block))
+    )
+  }
 
-      const allProblems: Problem[] = []
-      const allProposals: Proposal[] = []
-      const allBlackBoxEntries: BlackBoxEntry[] = []
+  const handleDeleteBlock = (blockId: string) => {
+    setBlocks((current) => (current || []).filter((block) => block.id !== blockId))
+    if (activeBlockId === blockId) {
+      setActiveBlockId(null)
+    }
+    toast.success('Block deleted')
+  }
 
-      seedBubbles.forEach(bubble => {
-        const bubbleProblems = generateSeedProblems(bubble.id)
-        const bubbleProposals = generateSeedProposals(bubble.id, bubbleProblems)
-        const bubbleBlackBox = generateSeedBlackBoxEntries(bubble.id, bubbleProposals)
-
-        allProblems.push(...bubbleProblems)
-        allProposals.push(...bubbleProposals)
-        allBlackBoxEntries.push(...bubbleBlackBox)
+  const handleStartBlock = (blockId: string) => {
+    if (activeBlockId && activeBlockId !== blockId) {
+      handleUpdateBlock(activeBlockId, {
+        status: 'paused',
       })
-
-      setProblems(allProblems)
-      setProposals(allProposals)
-      setBlackBox(allBlackBoxEntries)
-      setMetaAlerts(generateSeedMetaAlerts())
-      setInitialized(true)
-      toast.success('System initialized with seed data')
     }
-  }, [initialized, safeBubbles.length, setBubbles, setProblems, setProposals, setBlackBox, setMetaAlerts, setInitialized])
 
-  useEffect(() => {
-    if (initialized && !hasSeenWelcome) {
-      setShowWelcome(true)
-    }
-  }, [initialized, hasSeenWelcome])
-
-  const handleBubbleSelect = (bubble: Bubble) => {
-    const updatedBubble = bubblesWithStats.find(b => b.id === bubble.id) || bubble
-    setSelectedBubble(updatedBubble)
-    setShowSystemMonitor(false)
+    handleUpdateBlock(blockId, {
+      status: 'active',
+      startedAt: new Date(),
+    })
+    setActiveBlockId(blockId)
+    toast.success('Focus timer started')
   }
 
-  const handleBack = () => {
-    if (selectedBubble?.parentId) {
-      const parentBubble = bubblesWithStats.find(b => b.id === selectedBubble.parentId)
-      setSelectedBubble(parentBubble || null)
-    } else {
-      setSelectedBubble(null)
-    }
+  const handlePauseBlock = (blockId: string) => {
+    handleUpdateBlock(blockId, {
+      status: 'paused',
+    })
+    toast.info('Timer paused')
   }
 
-  const handleRefresh = () => {
-    toast.info('Refreshing system data...')
-    const updatedBubbles = bubblesWithStats.map(bubble => ({
-      ...bubble,
-      problemCount: safeProblems.filter(p => p.bubbleId === bubble.id).length,
-      proposalCount: safeProposals.filter(p => p.bubbleId === bubble.id).length,
-      activeAlerts: safeMetaAlerts.filter(a => a.bubbleId === bubble.id && a.severity !== 'low').length
-    }))
-    setBubbles(updatedBubbles)
-    toast.success('System data refreshed')
+  const handleCompleteBlock = (blockId: string, actualDuration: number) => {
+    handleUpdateBlock(blockId, {
+      status: 'completed',
+      completedAt: new Date(),
+      actualDuration,
+    })
+    if (activeBlockId === blockId) {
+      setActiveBlockId(null)
+    }
+    toast.success('Block completed!', {
+      description: 'Great work staying focused.',
+    })
   }
 
-  const handleWelcomeClose = (open: boolean) => {
-    setShowWelcome(open)
-    if (!open && !hasSeenWelcome) {
-      setHasSeenWelcome(true)
-    }
+  const handleAddTask = (task: Task) => {
+    setTasks((current) => [...(current || []), task])
   }
+
+  const handleUpdateTask = (taskId: string, updates: Partial<Task>) => {
+    setTasks((current) => (current || []).map((task) => (task.id === taskId ? { ...task, ...updates } : task)))
+  }
+
+  const handleDeleteTask = (taskId: string) => {
+    setTasks((current) => (current || []).filter((task) => task.id !== taskId))
+  }
+
+  const handleAddReflection = (reflection: DailyReflection) => {
+    setReflections((current) => [...(current || []), reflection])
+  }
+
+  const activeBlock = safeBlocks.find((block) => block.id === activeBlockId)
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <Header />
-      
-      <WelcomeDialog open={showWelcome} onOpenChange={handleWelcomeClose} />
-      
-      <main className="container mx-auto px-4 py-6 max-w-7xl">
-        <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
-          <div className="flex items-center gap-2">
-            {selectedBubble && (
-              <Button variant="ghost" onClick={handleBack}>
-                ← Back
-              </Button>
-            )}
-            {showSystemMonitor && (
-              <Button variant="ghost" onClick={() => setShowSystemMonitor(false)}>
-                ← Back to {viewMode === 'globe' ? 'Globe' : 'Map'}
-              </Button>
-            )}
-          </div>
-          
-          <div className="flex items-center gap-2 flex-wrap">
-            {!showSystemMonitor && !selectedBubble && (
-              <div className="flex items-center gap-2">
-                <Button
-                  variant={viewMode === 'map' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setViewMode('map')}
-                >
-                  <MapTrifold size={16} className="mr-2" />
-                  <span className="hidden sm:inline">Map View</span>
-                </Button>
-                <Button
-                  variant={viewMode === 'globe' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setViewMode('globe')}
-                >
-                  <Globe size={16} className="mr-2" />
-                  <span className="hidden sm:inline">Globe View</span>
-                </Button>
-              </div>
-            )}
-            
-            <Button 
-              variant="outline"
-              size="sm"
-              onClick={handleRefresh}
-              title="Refresh data"
-            >
-              <ArrowsClockwise size={16} />
+    <div className="min-h-screen bg-background">
+      <header className="border-b border-border bg-card">
+        <div className="container mx-auto px-4 py-6 max-w-6xl">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-semibold tracking-tight text-foreground">Focus</h1>
+              <p className="text-sm text-muted-foreground mt-1">Time blocking & deep work</p>
+            </div>
+            <Button onClick={() => setShowCreateDialog(true)} size="lg">
+              <Plus size={20} className="mr-2" />
+              New Block
             </Button>
-            
-            {!showSystemMonitor && (
-              <Button 
-                variant="outline"
-                onClick={() => {
-                  setShowSystemMonitor(true)
-                  setSelectedBubble(null)
-                }}
-              >
-                <ChartLine size={16} className="mr-2" />
-                <span className="hidden sm:inline">System Health</span>
-                <span className="sm:hidden">Health</span>
-              </Button>
-            )}
           </div>
         </div>
+      </header>
 
-        {safeMetaAlerts.length > 0 && !showSystemMonitor && (
-          <MetaAlertPanel alerts={safeMetaAlerts} />
-        )}
+      <main className="container mx-auto px-4 py-8 max-w-6xl">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2">
+            <Tabs value={currentTab} onValueChange={setCurrentTab}>
+              <TabsList className="mb-6">
+                <TabsTrigger value="today">Today</TabsTrigger>
+                <TabsTrigger value="week">Week</TabsTrigger>
+                <TabsTrigger value="analytics">Analytics</TabsTrigger>
+              </TabsList>
 
-        {showSystemMonitor ? (
-          <SystemMonitoring proposals={safeProposals} blackBoxEntries={safeBlackBox} />
-        ) : !selectedBubble ? (
-          viewMode === 'globe' ? (
-            <Globe3D
-              bubbles={bubblesWithStats}
-              problems={safeProblems}
-              proposals={safeProposals}
-              onBubbleSelect={handleBubbleSelect}
+              <TabsContent value="today" className="mt-0">
+                <TodayView
+                  blocks={safeBlocks}
+                  activeBlock={activeBlock}
+                  onStartBlock={handleStartBlock}
+                  onPauseBlock={handlePauseBlock}
+                  onCompleteBlock={handleCompleteBlock}
+                  onUpdateBlock={handleUpdateBlock}
+                  onDeleteBlock={handleDeleteBlock}
+                  reflections={safeReflections}
+                  onAddReflection={handleAddReflection}
+                />
+              </TabsContent>
+
+              <TabsContent value="week" className="mt-0">
+                <WeekView
+                  blocks={safeBlocks}
+                  onStartBlock={handleStartBlock}
+                  onUpdateBlock={handleUpdateBlock}
+                />
+              </TabsContent>
+
+              <TabsContent value="analytics" className="mt-0">
+                <AnalyticsView blocks={safeBlocks} reflections={safeReflections} />
+              </TabsContent>
+            </Tabs>
+          </div>
+
+          <div className="lg:col-span-1">
+            <TaskBacklog
+              tasks={safeTasks}
+              blocks={safeBlocks}
+              onAddTask={handleAddTask}
+              onUpdateTask={handleUpdateTask}
+              onDeleteTask={handleDeleteTask}
+              onCreateBlockFromTask={(task) => {
+                setShowCreateDialog(true)
+              }}
             />
-          ) : (
-            <BubbleMap 
-              bubbles={bubblesWithStats}
-              onBubbleSelect={handleBubbleSelect}
-            />
-          )
-        ) : (
-          <BubbleDashboard
-            bubble={selectedBubble}
-            bubbles={bubblesWithStats}
-            problems={safeProblems.filter(p => p.bubbleId === selectedBubble.id)}
-            proposals={safeProposals.filter(p => p.bubbleId === selectedBubble.id)}
-            blackBoxEntries={safeBlackBox.filter(e => e.bubbleId === selectedBubble.id)}
-            onBack={handleBack}
-            onBubbleSelect={handleBubbleSelect}
-          />
-        )}
+          </div>
+        </div>
       </main>
+
+      <CreateBlockDialog
+        open={showCreateDialog}
+        onOpenChange={setShowCreateDialog}
+        onCreateBlock={handleCreateBlock}
+        tasks={safeTasks}
+      />
     </div>
   )
 }
