@@ -1,4 +1,5 @@
-import { Eye } from '@phosphor-icons/react'
+import { Eye, LockKey, Network, Target, Database } from '@phosphor-icons/react'
+import { Badge } from '@/components/ui/badge'
 
 export function Header() {
   return (
@@ -16,9 +17,31 @@ export function Header() {
           </div>
           
           <div className="flex items-center gap-6">
+            <div className="hidden md:flex items-center gap-3">
+              <div className="flex items-center gap-1.5">
+                <LockKey size={14} className="text-primary" />
+                <span className="text-xs text-muted-foreground">L1</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Network size={14} className="text-success" />
+                <span className="text-xs text-muted-foreground">L2</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Target size={14} className="text-prediction" />
+                <span className="text-xs text-muted-foreground">L3</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Eye size={14} className="text-warning" />
+                <span className="text-xs text-muted-foreground">L4</span>
+              </div>
+            </div>
+            
             <div className="text-right">
               <p className="text-xs uppercase tracking-wide text-muted-foreground font-medium">Status</p>
-              <p className="text-sm font-mono text-success">All Systems Operational</p>
+              <div className="flex items-center gap-2">
+                <Database size={12} className="text-success" />
+                <p className="text-sm font-mono text-success">Operational</p>
+              </div>
             </div>
           </div>
         </div>
