@@ -125,13 +125,48 @@ export function Globe3D({ bubbles, problems, proposals, onBubbleSelect }: Globe3
     scene.add(backLight)
 
     const globeGeometry = new THREE.SphereGeometry(100, 64, 64)
+    
+    const canvas = document.createElement('canvas')
+    canvas.width = 2048
+    canvas.height = 1024
+    const ctx = canvas.getContext('2d')!
+    
+    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height)
+    gradient.addColorStop(0, '#e8f4f8')
+    gradient.addColorStop(0.3, '#4a90a4')
+    gradient.addColorStop(0.5, '#2b5876')
+    gradient.addColorStop(0.7, '#4a90a4')
+    gradient.addColorStop(1, '#e8f4f8')
+    ctx.fillStyle = gradient
+    ctx.fillRect(0, 0, canvas.width, canvas.height)
+    
+    ctx.fillStyle = '#1a4d2e'
+    for (let i = 0; i < 150; i++) {
+      const x = Math.random() * canvas.width
+      const y = Math.random() * canvas.height
+      const size = Math.random() * 200 + 50
+      ctx.beginPath()
+      for (let j = 0; j < 8; j++) {
+        const angle = (j / 8) * Math.PI * 2 + Math.random() * 0.5
+        const radius = size * (0.5 + Math.random() * 0.5)
+        const px = x + Math.cos(angle) * radius
+        const py = y + Math.sin(angle) * radius
+        if (j === 0) ctx.moveTo(px, py)
+        else ctx.lineTo(px, py)
+      }
+      ctx.closePath()
+      ctx.fill()
+    }
+    
+    const texture = new THREE.CanvasTexture(canvas)
+    texture.needsUpdate = true
+    
     const globeMaterial = new THREE.MeshPhongMaterial({
-      color: 0x1a1a2e,
-      emissive: 0x0a0a1a,
-      specular: 0x111111,
-      shininess: 5,
-      transparent: true,
-      opacity: 0.95,
+      map: texture,
+      bumpMap: texture,
+      bumpScale: 0.5,
+      specular: 0x333333,
+      shininess: 15,
     })
     const globe = new THREE.Mesh(globeGeometry, globeMaterial)
     globeRef.current = globe
