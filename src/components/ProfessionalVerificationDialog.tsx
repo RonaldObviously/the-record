@@ -125,7 +125,7 @@ export function ProfessionalVerificationDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col p-0 gap-0">
+      <DialogContent className="max-w-3xl h-[90vh] flex flex-col p-0 gap-0 overflow-hidden">
         <div className="px-6 pt-6 pb-4 shrink-0">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
@@ -139,8 +139,8 @@ export function ProfessionalVerificationDialog({
           </DialogHeader>
         </div>
 
-        <ScrollArea className="flex-1 px-6">
-          <Tabs value={currentStep} onValueChange={(v) => setCurrentStep(v as any)} className="pb-4 pr-4">
+        <ScrollArea className="flex-1 overflow-auto">
+          <Tabs value={currentStep} onValueChange={(v) => setCurrentStep(v as any)} className="pb-4 px-6 pr-10">
           <TabsList className="grid grid-cols-4 w-full">
             <TabsTrigger value="role">Role</TabsTrigger>
             <TabsTrigger value="credentials" disabled={!selectedRole}>Credentials</TabsTrigger>

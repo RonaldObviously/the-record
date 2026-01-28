@@ -30,7 +30,7 @@ interface WelcomeDialogProps {
 export function WelcomeDialog({ open, onGetStarted }: WelcomeDialogProps) {
   return (
     <Dialog open={open} onOpenChange={() => {}}>
-      <DialogContent className="max-w-3xl max-h-[85vh] flex flex-col p-0 gap-0">
+      <DialogContent className="max-w-3xl h-[90vh] flex flex-col p-0 gap-0 overflow-hidden">
         <div className="px-6 pt-6 pb-4 shrink-0">
           <DialogHeader>
             <DialogTitle className="font-mono text-3xl">Welcome to THE RECORD</DialogTitle>
@@ -40,8 +40,8 @@ export function WelcomeDialog({ open, onGetStarted }: WelcomeDialogProps) {
           </DialogHeader>
         </div>
 
-        <ScrollArea className="flex-1 px-6">
-          <div className="space-y-6 pb-4 pr-4">
+        <ScrollArea className="flex-1 overflow-auto">
+          <div className="space-y-6 pb-4 px-6 pr-10">
           <div className="bg-accent/10 border border-accent/30 p-4 rounded-lg">
             <p className="text-sm leading-relaxed">
               THE RECORD is <strong>not a government, voting system, or social network</strong>.
