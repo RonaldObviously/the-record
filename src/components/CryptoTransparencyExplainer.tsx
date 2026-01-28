@@ -15,8 +15,8 @@ export function CryptoTransparencyExplainer() {
           Storage Security
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col p-0 gap-0">
-        <div className="px-6 pt-6 pb-4 shrink-0">
+      <DialogContent className="max-w-4xl h-[85vh] p-0 gap-0">
+        <div className="px-6 pt-6 pb-4">
           <DialogHeader>
             <DialogTitle className="text-2xl font-mono">How We Prevent Capture</DialogTitle>
             <DialogDescription className="text-base">
@@ -25,8 +25,8 @@ export function CryptoTransparencyExplainer() {
           </DialogHeader>
         </div>
 
-        <ScrollArea className="flex-1 overflow-auto">
-          <Tabs defaultValue="problem" className="mt-6 pb-6 px-6 pr-10">
+        <div className="flex-1 overflow-y-auto px-6 pr-4">
+          <Tabs defaultValue="problem" className="mt-6 pb-6">
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="problem">The Problem</TabsTrigger>
             <TabsTrigger value="solution">Our Solution</TabsTrigger>
@@ -349,7 +349,7 @@ export function CryptoTransparencyExplainer() {
             </Card>
           </TabsContent>
         </Tabs>
-      </ScrollArea>
+        </div>
       </DialogContent>
     </Dialog>
   )

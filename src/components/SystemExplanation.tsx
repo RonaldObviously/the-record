@@ -39,8 +39,8 @@ export function SystemExplanation() {
           How THE RECORD Works
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-4xl max-h-[85vh] flex flex-col p-0 gap-0">
-        <div className="px-6 pt-6 pb-4 shrink-0">
+      <DialogContent className="max-w-4xl h-[85vh] p-0 gap-0">
+        <div className="px-6 pt-6 pb-4">
           <DialogHeader>
             <DialogTitle className="font-mono text-2xl">Understanding THE RECORD</DialogTitle>
             <DialogDescription>
@@ -49,8 +49,8 @@ export function SystemExplanation() {
           </DialogHeader>
         </div>
 
-        <ScrollArea className="flex-1 px-6">
-          <Tabs defaultValue="intro" className="w-full pb-4 pr-4">
+        <div className="flex-1 overflow-y-auto px-6 pr-4">
+          <Tabs defaultValue="intro" className="w-full pb-4">
           <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="intro">Overview</TabsTrigger>
             <TabsTrigger value="how">How It Works</TabsTrigger>
@@ -447,7 +447,7 @@ export function SystemExplanation() {
             <ArrowRight size={16} className="ml-2" />
           </Button>
         </div>
-      </ScrollArea>
+        </div>
       </DialogContent>
     </Dialog>
   )
