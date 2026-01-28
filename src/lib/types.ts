@@ -162,7 +162,7 @@ export interface MetaAlert {
 export interface BlackBoxEvent {
   id: string
   timestamp: Date
-  type: 'signal' | 'problem' | 'proposal' | 'validation' | 'prediction' | 'settlement' | 'alert' | 'attestation'
+  type: 'signal' | 'signal-submitted' | 'cluster-promoted' | 'problem' | 'proposal' | 'validation' | 'prediction' | 'settlement' | 'alert' | 'attestation'
   data: any
   hash: string
   previousHash: string

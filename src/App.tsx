@@ -10,19 +10,24 @@ import { SystemMonitoring } from '@/components/SystemMonitoring'
 import { MetaAlertPanel } from '@/components/MetaAlertPanel'
 import { SubmitProblemDialog } from '@/components/SubmitProblemDialog'
 import { SubmitProposalDialog } from '@/components/SubmitProposalDialog'
+import { SubmitSignalDialog } from '@/components/SubmitSignalDialog'
+import { SignalAggregationMatrix } from '@/components/SignalAggregationMatrix'
+import { GlobeVisualization } from '@/components/GlobeVisualization'
 import { BlackBoxLog } from '@/components/BlackBoxLog'
 import { OnboardingFlow } from '@/components/OnboardingFlow'
 import { AccountDashboard } from '@/components/AccountDashboard'
 import { initializeSystem } from '@/lib/seedData'
-import type { Bubble, Problem, Proposal, MetaAlert, BlackBoxEvent } from '@/lib/types'
+import { promoteClusterToProblem } from '@/lib/signalLifecycle'
+import type { Bubble, Problem, Proposal, MetaAlert, BlackBoxEvent, Signal, SignalCluster } from '@/lib/types'
 import type { UserAccount } from '@/lib/auth'
 import { canSubmitSignals } from '@/lib/auth'
-import { Plus, Warning, User } from '@phosphor-icons/react'
+import { Plus, Warning, User, Broadcast } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 
 function App() {
   const [initialized, setInitialized] = useKV<boolean>('system-initialized', false)
   const [bubbles, setBubbles] = useKV<Bubble[]>('bubbles', [])
+  const [signals, setSignals] = useKV<Signal[]>('signals', [])
   const [problems, setProblems] = useKV<Problem[]>('problems', [])
   const [proposals, setProposals] = useKV<Proposal[]>('proposals', [])
   const [metaAlerts, setMetaAlerts] = useKV<MetaAlert[]>('meta-alerts', [])
@@ -30,11 +35,13 @@ function App() {
   const [userAccount, setUserAccount] = useKV<UserAccount | null>('user-account', null)
   
   const [selectedBubbleId, setSelectedBubbleId] = useState<string | null>(null)
+  const [showSignalDialog, setShowSignalDialog] = useState(false)
   const [showProblemDialog, setShowProblemDialog] = useState(false)
   const [showProposalDialog, setShowProposalDialog] = useState(false)
   const [showSystemHealth, setShowSystemHealth] = useState(false)
   const [showOnboarding, setShowOnboarding] = useState(false)
   const [showAccountDashboard, setShowAccountDashboard] = useState(false)
+  const [showGlobeView, setShowGlobeView] = useState(false)
   const [currentLayer, setCurrentLayer] = useState<'L1' | 'L2' | 'L3' | 'L4'>('L1')
 
   useEffect(() => {
@@ -45,8 +52,9 @@ function App() {
       setProposals(data.proposals)
       setMetaAlerts(data.metaAlerts)
       setBlackBox(data.blackBox)
+      setSignals([])
       setInitialized(true)
-      toast.success('The Record initialized')
+      toast.success('THE RECORD initialized')
     }
   }, [initialized])
 
@@ -57,14 +65,70 @@ function App() {
   }, [userAccount, initialized])
 
   const safeBubbles = Array.isArray(bubbles) ? bubbles : []
+  const safeSignals = Array.isArray(signals) ? signals : []
   const safeProblems = Array.isArray(problems) ? problems : []
   const safeProposals = Array.isArray(proposals) ? proposals : []
   const safeMetaAlerts = Array.isArray(metaAlerts) ? metaAlerts : []
   const safeBlackBox = Array.isArray(blackBox) ? blackBox : []
 
   const selectedBubble = safeBubbles.find(b => b.id === selectedBubbleId)
+  const bubbleSignals = safeSignals.filter(s => s.bubbleId === selectedBubbleId)
   const bubbleProblems = safeProblems.filter(p => p.bubbleId === selectedBubbleId)
   const bubbleProposals = safeProposals.filter(p => p.bubbleId === selectedBubbleId)
+
+  const handleSubmitSignal = (signal: Signal) => {
+    if (!userAccount || !canSubmitSignals(userAccount)) {
+      toast.error('You need a humanity score of 30+ to submit signals')
+      return
+    }
+    
+    setSignals((current) => [...(current || []), signal])
+    
+    const event: BlackBoxEvent = {
+      id: `event-${Date.now()}`,
+      type: 'signal-submitted',
+      timestamp: new Date(),
+      data: {
+        signalId: signal.id,
+        category: signal.category,
+        h3Cell: signal.h3Cell,
+      },
+      hash: `hash-${Date.now()}`,
+      previousHash: safeBlackBox[safeBlackBox.length - 1]?.hash || 'genesis',
+    }
+    setBlackBox((current) => [...(current || []), event])
+    
+    toast.success('Signal submitted to L1 layer')
+  }
+
+  const handleClusterPromoted = (cluster: SignalCluster) => {
+    const problem = promoteClusterToProblem(cluster)
+    setProblems((current) => [...(current || []), problem])
+    
+    setSignals((current) =>
+      (current || []).map(s =>
+        cluster.signals.some(cs => cs.id === s.id)
+          ? { ...s, status: 'clustered' as const, clusterId: cluster.id }
+          : s
+      )
+    )
+    
+    const event: BlackBoxEvent = {
+      id: `event-${Date.now()}`,
+      type: 'cluster-promoted',
+      timestamp: new Date(),
+      data: {
+        clusterId: cluster.id,
+        problemId: problem.id,
+        signalCount: cluster.signals.length,
+      },
+      hash: `hash-${Date.now()}`,
+      previousHash: safeBlackBox[safeBlackBox.length - 1]?.hash || 'genesis',
+    }
+    setBlackBox((current) => [...(current || []), event])
+    
+    toast.success(`Cluster promoted to Problem: "${problem.description}"`)
+  }
 
   const handleSubmitProblem = (problem: Problem) => {
     if (!userAccount || !canSubmitSignals(userAccount)) {
@@ -100,7 +164,7 @@ function App() {
             <div>
               <h1 className="text-2xl font-semibold text-foreground font-mono">THE RECORD</h1>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Transparent Collective Decision System
+                Sovereign Coordination Engine
               </p>
             </div>
             <div className="flex items-center gap-3">
@@ -117,6 +181,14 @@ function App() {
               <Button
                 variant="outline"
                 size="sm"
+                onClick={() => setShowGlobeView(!showGlobeView)}
+              >
+                <Broadcast size={16} className="mr-1.5" />
+                Globe View
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => setShowSystemHealth(!showSystemHealth)}
               >
                 System Health
@@ -126,10 +198,10 @@ function App() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setShowProblemDialog(true)}
+                    onClick={() => setShowSignalDialog(true)}
                   >
                     <Plus size={16} className="mr-1.5" />
-                    Report Problem
+                    Submit Signal
                   </Button>
                   <Button
                     size="sm"
@@ -157,6 +229,35 @@ function App() {
       <main className="container mx-auto px-6 py-8 max-w-7xl">
         {showSystemHealth ? (
           <SystemMonitoring onClose={() => setShowSystemHealth(false)} />
+        ) : showGlobeView ? (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-semibold">Global Signal Map</h2>
+                <p className="text-sm text-muted-foreground">
+                  Real-time visualization of all signals across The Record
+                </p>
+              </div>
+              <Button variant="outline" onClick={() => setShowGlobeView(false)}>
+                Back to Bubble View
+              </Button>
+            </div>
+            <GlobeVisualization
+              signals={safeSignals}
+              clusters={[]}
+              bubbles={safeBubbles}
+              selectedBubbleId={selectedBubbleId}
+              onSelectLocation={(lat, lng) => {
+                console.log('Selected location:', lat, lng)
+              }}
+            />
+            {selectedBubbleId && (
+              <SignalAggregationMatrix
+                signals={bubbleSignals}
+                onClusterPromoted={handleClusterPromoted}
+              />
+            )}
+          </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2">
@@ -194,42 +295,89 @@ function App() {
               </Card>
 
               {selectedBubbleId && (
-                <Card className="p-6 mt-6">
-                  <Tabs value={currentLayer} onValueChange={(v) => setCurrentLayer(v as any)}>
-                    <TabsList className="mb-6">
-                      <TabsTrigger value="L1">L1: Problems</TabsTrigger>
-                      <TabsTrigger value="L2">L2: Proposals</TabsTrigger>
-                      <TabsTrigger value="L3">L3: Tracking</TabsTrigger>
-                      <TabsTrigger value="L4">L4: Meta</TabsTrigger>
-                    </TabsList>
+                <>
+                  <Card className="p-6 mt-6">
+                    <SignalAggregationMatrix
+                      signals={bubbleSignals}
+                      onClusterPromoted={handleClusterPromoted}
+                    />
+                  </Card>
 
-                    <TabsContent value="L1" className="mt-0">
-                      <ProblemList problems={bubbleProblems} />
-                    </TabsContent>
+                  <Card className="p-6 mt-6">
+                    <Tabs value={currentLayer} onValueChange={(v) => setCurrentLayer(v as any)}>
+                      <TabsList className="mb-6">
+                        <TabsTrigger value="L1">L1: Signals</TabsTrigger>
+                        <TabsTrigger value="L2">L2: Proposals</TabsTrigger>
+                        <TabsTrigger value="L3">L3: Tracking</TabsTrigger>
+                        <TabsTrigger value="L4">L4: Meta</TabsTrigger>
+                      </TabsList>
 
-                    <TabsContent value="L2" className="mt-0">
-                      <ProposalList 
-                        proposals={bubbleProposals}
-                        showValidations={true}
-                      />
-                    </TabsContent>
+                      <TabsContent value="L1" className="mt-0">
+                        <div className="space-y-4">
+                          <div>
+                            <h3 className="font-semibold mb-2">Raw Signals</h3>
+                            <p className="text-sm text-muted-foreground mb-4">
+                              Individual observations submitted anonymously
+                            </p>
+                          </div>
+                          {bubbleSignals.filter(s => s.status === 'raw').length === 0 ? (
+                            <div className="text-center py-8 text-muted-foreground">
+                              No raw signals yet. Be the first to submit one.
+                            </div>
+                          ) : (
+                            <div className="space-y-3">
+                              {bubbleSignals.filter(s => s.status === 'raw').map(signal => (
+                                <Card key={signal.id} className="p-4">
+                                  <div className="flex items-start justify-between">
+                                    <div className="flex-1">
+                                      <div className="flex items-center gap-2 mb-2">
+                                        <span className="text-xs font-mono text-muted-foreground">
+                                          {signal.category}
+                                        </span>
+                                        <span className="text-xs text-muted-foreground">
+                                          {new Date(signal.submittedAt).toLocaleString()}
+                                        </span>
+                                      </div>
+                                      <p className="text-sm">{signal.description}</p>
+                                    </div>
+                                    <div className="text-xs text-muted-foreground">
+                                      {signal.attestations} attestations
+                                    </div>
+                                  </div>
+                                </Card>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        <div className="mt-6">
+                          <ProblemList problems={bubbleProblems} />
+                        </div>
+                      </TabsContent>
 
-                    <TabsContent value="L3" className="mt-0">
-                      <ProposalList 
-                        proposals={bubbleProposals.filter(p => p.status === 'active' || p.status === 'completed')}
-                        showPredictions={true}
-                      />
-                    </TabsContent>
+                      <TabsContent value="L2" className="mt-0">
+                        <ProposalList 
+                          proposals={bubbleProposals}
+                          showValidations={true}
+                        />
+                      </TabsContent>
 
-                    <TabsContent value="L4" className="mt-0">
-                      <MetaAlertPanel 
-                        alerts={safeMetaAlerts.filter(a => 
-                          a.affectedBubbles.includes(selectedBubbleId)
-                        )} 
-                      />
-                    </TabsContent>
-                  </Tabs>
-                </Card>
+                      <TabsContent value="L3" className="mt-0">
+                        <ProposalList 
+                          proposals={bubbleProposals.filter(p => p.status === 'active' || p.status === 'completed')}
+                          showPredictions={true}
+                        />
+                      </TabsContent>
+
+                      <TabsContent value="L4" className="mt-0">
+                        <MetaAlertPanel 
+                          alerts={safeMetaAlerts.filter(a => 
+                            a.affectedBubbles.includes(selectedBubbleId)
+                          )} 
+                        />
+                      </TabsContent>
+                    </Tabs>
+                  </Card>
+                </>
               )}
             </div>
 
@@ -245,6 +393,12 @@ function App() {
 
       {selectedBubbleId && userAccount && (
         <>
+          <SubmitSignalDialog
+            open={showSignalDialog}
+            onOpenChange={setShowSignalDialog}
+            bubbleId={selectedBubbleId}
+            onSubmit={handleSubmitSignal}
+          />
           <SubmitProblemDialog
             open={showProblemDialog}
             onOpenChange={setShowProblemDialog}

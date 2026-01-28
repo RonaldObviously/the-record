@@ -9,6 +9,8 @@ interface BlackBoxLogProps {
 
 const eventIcons: Record<BlackBoxEvent['type'], string> = {
   signal: '📡',
+  'signal-submitted': '📡',
+  'cluster-promoted': '🔥',
   problem: '🔴',
   proposal: '📋',
   validation: '✓',
