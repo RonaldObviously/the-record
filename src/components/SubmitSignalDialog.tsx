@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -29,6 +29,7 @@ interface SubmitSignalDialogProps {
   onOpenChange: (open: boolean) => void
   bubbleId: string
   onSubmit: (signal: Signal) => void
+  preselectedH3Cell?: string
 }
 
 const CATEGORIES: { value: ProblemCategory; label: string }[] = [
@@ -49,14 +50,25 @@ export function SubmitSignalDialog({
   onOpenChange,
   bubbleId,
   onSubmit,
+  preselectedH3Cell,
 }: SubmitSignalDialogProps) {
   const [category, setCategory] = useState<ProblemCategory>('infrastructure')
   const [description, setDescription] = useState('')
-  const [useLocation, setUseLocation] = useState(false)
+  const [useLocation, setUseLocation] = useState(!!preselectedH3Cell)
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null)
-  const [h3Cell, setH3Cell] = useState<string>('')
-  const [blurredArea, setBlurredArea] = useState<string>('')
+  const [h3Cell, setH3Cell] = useState<string>(preselectedH3Cell || '')
+  const [blurredArea, setBlurredArea] = useState<string>(
+    preselectedH3Cell ? '~500m radius' : ''
+  )
   const [anonymous, setAnonymous] = useState(true)
+
+  useEffect(() => {
+    if (preselectedH3Cell) {
+      setH3Cell(preselectedH3Cell)
+      setUseLocation(true)
+      setBlurredArea('~500m radius')
+    }
+  }, [preselectedH3Cell])
 
   const handleGetLocation = () => {
     if (!navigator.geolocation) {
@@ -205,11 +217,14 @@ export function SubmitSignalDialog({
               <div className="p-3 bg-muted/40 rounded-lg border border-border">
                 <div className="flex items-center gap-2 text-sm mb-2">
                   <ShieldCheck size={16} className="text-success" />
-                  <span className="font-medium text-success">Location Privacy Enabled</span>
+                  <span className="font-medium text-success">
+                    {preselectedH3Cell ? 'Mesh Cell Selected from Map' : 'Location Privacy Enabled'}
+                  </span>
                 </div>
                 <p className="text-xs text-muted-foreground mb-2">
-                  Your exact location has been cryptographically blurred to a {blurredArea} hexagonal cell.
-                  This proves the signal is from this area without revealing your precise location.
+                  {preselectedH3Cell
+                    ? 'You selected this mesh cell from the satellite map. Your signal will be associated with this hexagonal area.'
+                    : `Your exact location has been cryptographically blurred to a ${blurredArea} hexagonal cell. This proves the signal is from this area without revealing your precise location.`}
                 </p>
                 <div className="font-mono text-[10px] text-muted-foreground break-all">
                   H3 Cell: {h3Cell}

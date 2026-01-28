@@ -15,6 +15,7 @@ interface SatelliteMapViewProps {
   clusters?: SignalCluster[]
   onSignalClick?: (signal: Signal) => void
   onClusterClick?: (cluster: SignalCluster) => void
+  onMeshCellClick?: (h3Cell: string, coordinates: { lat: number; lng: number }) => void
   showMeshRange?: boolean
 }
 
@@ -63,7 +64,7 @@ const CATEGORY_COLORS: Record<string, string> = {
   other: '#6b7280',
 }
 
-export function SatelliteMapView({ signals, clusters = [], onSignalClick, onClusterClick, showMeshRange = true }: SatelliteMapViewProps) {
+export function SatelliteMapView({ signals, clusters = [], onSignalClick, onClusterClick, onMeshCellClick, showMeshRange = true }: SatelliteMapViewProps) {
   const [showHeatMap, setShowHeatMap] = useState(true)
   const [heatIntensity, setHeatIntensity] = useState<'low' | 'medium' | 'high'>('medium')
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null)
@@ -142,6 +143,11 @@ export function SatelliteMapView({ signals, clusters = [], onSignalClick, onClus
           </h2>
           <p className="text-sm text-muted-foreground mt-1">
             Real-time geospatial distribution of signals across Earth
+            {onMeshCellClick && meshRangeVisible && (
+              <span className="ml-2 text-accent font-medium">
+                • Click any mesh cell to submit a signal
+              </span>
+            )}
           </p>
         </div>
         
@@ -214,14 +220,42 @@ export function SatelliteMapView({ signals, clusters = [], onSignalClick, onClus
                     weight: 2,
                     dashArray: '4, 4',
                   }}
+                  eventHandlers={{
+                    click: () => {
+                      onMeshCellClick?.(meshCell.cell, meshCell.center)
+                    },
+                    mouseover: (e) => {
+                      const target = e.target as any
+                      target.setStyle({
+                        fillOpacity: 0.3,
+                        weight: 3,
+                      })
+                    },
+                    mouseout: (e) => {
+                      const target = e.target as any
+                      target.setStyle({
+                        fillOpacity: 0.15,
+                        weight: 2,
+                      })
+                    },
+                  }}
                 >
                   <Popup>
                     <div className="p-2">
                       <div className="text-xs font-semibold mb-1">Mesh Cell</div>
-                      <div className="text-xs font-mono">{meshCell.cell}</div>
-                      <div className="text-xs text-muted-foreground mt-2">
+                      <div className="text-xs font-mono mb-2">{meshCell.cell}</div>
+                      <div className="text-xs text-muted-foreground mb-2">
                         This is your reporting range. Signals you submit will be blurred to this hex area for privacy.
                       </div>
+                      {onMeshCellClick && (
+                        <Button 
+                          size="sm" 
+                          className="w-full text-xs mt-2"
+                          onClick={() => onMeshCellClick(meshCell.cell, meshCell.center)}
+                        >
+                          Submit Signal Here
+                        </Button>
+                      )}
                     </div>
                   </Popup>
                 </Polygon>
@@ -325,7 +359,9 @@ export function SatelliteMapView({ signals, clusters = [], onSignalClick, onClus
               Your Mesh Range
             </div>
             <div className="text-xs text-muted-foreground mb-3">
-              Adjust reporting radius
+              {onMeshCellClick 
+                ? 'Click any blue cell to submit a signal' 
+                : 'Adjust reporting radius'}
             </div>
             <div className="flex flex-col gap-2">
               <Button

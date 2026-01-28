@@ -48,6 +48,7 @@ function App() {
   const [showGlobeView, setShowGlobeView] = useState(false)
   const [showSatelliteMap, setShowSatelliteMap] = useState(false)
   const [currentLayer, setCurrentLayer] = useState<'L1' | 'L2' | 'L3' | 'L4'>('L1')
+  const [selectedH3Cell, setSelectedH3Cell] = useState<string | null>(null)
 
   useEffect(() => {
     if (!initialized) {
@@ -283,6 +284,15 @@ function App() {
               onSignalClick={(signal) => {
                 console.log('Selected signal:', signal)
               }}
+              onMeshCellClick={(h3Cell, coordinates) => {
+                if (!userAccount || !canSubmitSignals(userAccount)) {
+                  toast.error('You need a humanity score of 30+ to submit signals')
+                  return
+                }
+                setSelectedH3Cell(h3Cell)
+                setShowSignalDialog(true)
+                toast.info(`Submit a signal for H3 cell: ${h3Cell}`)
+              }}
             />
           </div>
         ) : showGlobeView ? (
@@ -449,27 +459,37 @@ function App() {
         )}
       </main>
 
-      {selectedBubbleId && userAccount && (
+      {(selectedBubbleId || showSatelliteMap) && userAccount && (
         <>
           <SubmitSignalDialog
             open={showSignalDialog}
-            onOpenChange={setShowSignalDialog}
-            bubbleId={selectedBubbleId}
+            onOpenChange={(open) => {
+              setShowSignalDialog(open)
+              if (!open) {
+                setSelectedH3Cell(null)
+              }
+            }}
+            bubbleId={selectedBubbleId || 'global'}
             onSubmit={handleSubmitSignal}
+            preselectedH3Cell={selectedH3Cell || undefined}
           />
-          <SubmitProblemDialog
-            open={showProblemDialog}
-            onOpenChange={setShowProblemDialog}
-            bubbleId={selectedBubbleId}
-            onSubmit={handleSubmitProblem}
-          />
-          <SubmitProposalDialog
-            open={showProposalDialog}
-            onOpenChange={setShowProposalDialog}
-            bubbleId={selectedBubbleId}
-            problems={bubbleProblems}
-            onSubmit={handleSubmitProposal}
-          />
+          {selectedBubbleId && (
+            <>
+              <SubmitProblemDialog
+                open={showProblemDialog}
+                onOpenChange={setShowProblemDialog}
+                bubbleId={selectedBubbleId}
+                onSubmit={handleSubmitProblem}
+              />
+              <SubmitProposalDialog
+                open={showProposalDialog}
+                onOpenChange={setShowProposalDialog}
+                bubbleId={selectedBubbleId}
+                problems={bubbleProblems}
+                onSubmit={handleSubmitProposal}
+              />
+            </>
+          )}
         </>
       )}
 
