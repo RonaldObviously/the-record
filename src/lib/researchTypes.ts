@@ -1,79 +1,85 @@
-export interface ResearchPaper {
+export interface ResearchSubmission {
   id: string
-  title: string
-  authors: string[]
-  abstract: string
-  ipfsHash: string
-  submittedAt: Date
-  category: string[]
-  linkedProblems: string[]
-  linkedProposals: string[]
-  validations: ResearchValidation[]
-  credibilityScore: number
-  predictionsMade: number
-  predictionsAccurate: number
-  citationCount: number
-}
-
-export interface ResearchValidation {
-  id: string
-  validatorId: string
-  validatorType: 'peer' | 'professional' | 'independent'
-  passed: boolean
-  notes: string
-  timestamp: Date
-  criteria: {
-    methodology: boolean
-    dataQuality: boolean
-    reproducibility: boolean
-    conflictOfInterest: boolean
-  }
-}
-
-export interface Idea {
-  id: string
-  title: string
-  description: string
-  category: string
-  submittedAt: Date
+  bubbleId: string
   submittedBy: string
-  status: 'proposed' | 'discussed' | 'testing' | 'graduated' | 'rejected'
-  interestSignals: number
+  submittedAt: Date
+  title: string
+  abstract: string
+  methodology: string
+  dataSource: string
+  findings: string
+  conclusions: string
   linkedProblems: string[]
-  refinements: IdeaRefinement[]
-  experimentalResults?: ExperimentalResult
-  graduatedProposalId?: string
+  status: 'peer-review' | 'validated' | 'rejected' | 'published'
+  peerReviews: PeerReview[]
+  citations: string[]
+  ipfsCid?: string
+  credibilityScore: number
 }
 
-export interface IdeaRefinement {
+export interface PeerReview {
   id: string
-  userId: string
-  suggestion: string
-  timestamp: Date
-  adopted: boolean
+  reviewerId: string
+  submittedAt: Date
+  methodologyScore: number
+  dataQualityScore: number
+  reproducibilityScore: number
+  comments: string
+  recommendation: 'accept' | 'revise' | 'reject'
 }
 
-export interface ExperimentalResult {
+export interface KnowledgeGraphNode {
   id: string
-  testDescription: string
-  startDate: Date
-  endDate?: Date
-  results: string
-  success: boolean
-  dataIPFSHash?: string
+  type: 'research' | 'problem' | 'proposal' | 'signal'
+  title: string
+  connections: string[]
+  weight: number
 }
 
-export interface KnowledgeEntry {
+export interface ClusterMetadata {
   id: string
-  type: 'problem-pattern' | 'solution-effectiveness' | 'validator-performance' | 'prediction-accuracy'
+  level: number
+  h3Cell: string
+  signalIds: string[]
+  childClusterIds?: string[]
+  parentClusterId?: string | null
   category: string
-  summary: string
-  tags: string[]
-  h3Cells: string[]
-  linkedProblems: string[]
-  linkedProposals: string[]
-  linkedResearch: string[]
-  createdAt: Date
-  ipfsHash: string
-  relevanceScore: number
+  severity: number
+  firstDetected: Date
+  lastUpdated: Date
+}
+
+export interface QualityInspection {
+  id: string
+  proposalId: string
+  inspectorId: string
+  inspectedAt: Date
+  photoEvidence: string[]
+  sensorData?: Record<string, number>
+  qualityScore: number
+  passed: boolean
+  issues: string[]
+  requiresRework: boolean
+}
+
+export interface TreasuryTransaction {
+  id: string
+  type: 'deposit' | 'withdrawal' | 'reward' | 'slash' | 'fee'
+  amount: number
+  fromAddress: string
+  toAddress: string
+  reason: string
+  timestamp: Date
+  blockNumber: number
+  hash: string
+}
+
+export interface TreasuryState {
+  totalBalance: number
+  inflowToday: number
+  outflowToday: number
+  rewardsPoolBalance: number
+  operatingBalance: number
+  reserveBalance: number
+  transactions: TreasuryTransaction[]
 }

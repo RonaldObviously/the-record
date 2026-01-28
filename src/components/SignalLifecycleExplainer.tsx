@@ -8,6 +8,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import { GitBranch } from '@phosphor-icons/react'
 import { SignalToProblemVisual } from '@/components/SignalToProblemVisual'
 import { SignalFlowDiagram } from '@/components/SignalFlowDiagram'
@@ -24,8 +25,8 @@ export function SignalLifecycleExplainer() {
           Signal Lifecycle
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-5xl h-[90vh] p-0 gap-0">
-        <div className="px-6 pt-6 pb-4">
+      <DialogContent className="max-w-5xl max-h-[90vh] p-0 gap-0 flex flex-col">
+        <div className="px-6 pt-6 pb-4 flex-shrink-0">
           <DialogHeader>
             <DialogTitle className="font-mono text-2xl">Signal to Problem Lifecycle</DialogTitle>
             <DialogDescription>
@@ -34,7 +35,7 @@ export function SignalLifecycleExplainer() {
           </DialogHeader>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-6 pr-4 pb-6">
+        <ScrollArea className="flex-1 px-6 pb-6">
           <Tabs defaultValue="visual" className="w-full">
             <TabsList className="grid w-full grid-cols-2 mb-6">
               <TabsTrigger value="visual">Interactive Visual</TabsTrigger>
@@ -49,7 +50,7 @@ export function SignalLifecycleExplainer() {
               <SignalFlowDiagram />
             </TabsContent>
           </Tabs>
-        </div>
+        </ScrollArea>
       </DialogContent>
     </Dialog>
   )
