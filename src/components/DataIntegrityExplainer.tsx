@@ -15,11 +15,14 @@ export function DataIntegrityExplainer() {
           Data Protection
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-4xl max-h-[90vh]">
-        <DialogHeader>
-          <DialogTitle>How THE RECORD Protects Your Data</DialogTitle>
-        </DialogHeader>
-        <ScrollArea className="h-[calc(90vh-8rem)] pr-4">
+      <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col p-0 gap-0">
+        <div className="px-6 pt-6 pb-4 shrink-0">
+          <DialogHeader>
+            <DialogTitle>How THE RECORD Protects Your Data</DialogTitle>
+          </DialogHeader>
+        </div>
+        <ScrollArea className="flex-1 overflow-auto">
+          <div className="px-6 pb-6 pr-10">
           <Tabs defaultValue="overview" className="w-full">
             <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="overview">Overview</TabsTrigger>
@@ -333,6 +336,7 @@ export function DataIntegrityExplainer() {
               </div>
             </TabsContent>
           </Tabs>
+          </div>
         </ScrollArea>
       </DialogContent>
     </Dialog>

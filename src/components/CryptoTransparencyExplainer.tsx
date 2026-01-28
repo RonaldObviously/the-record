@@ -25,8 +25,8 @@ export function CryptoTransparencyExplainer() {
           </DialogHeader>
         </div>
 
-        <ScrollArea className="flex-1 px-6">
-          <Tabs defaultValue="problem" className="mt-6 pb-4 pr-4">
+        <ScrollArea className="flex-1 overflow-auto">
+          <Tabs defaultValue="problem" className="mt-6 pb-6 px-6 pr-10">
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="problem">The Problem</TabsTrigger>
             <TabsTrigger value="solution">Our Solution</TabsTrigger>
