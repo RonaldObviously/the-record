@@ -8,11 +8,14 @@ interface BlackBoxLogProps {
 }
 
 const eventIcons: Record<BlackBoxEvent['type'], string> = {
+  signal: '📡',
   problem: '🔴',
   proposal: '📋',
   validation: '✓',
   prediction: '🎯',
-  alert: '⚠️'
+  settlement: '⚖️',
+  alert: '⚠️',
+  attestation: '👁️'
 }
 
 export function BlackBoxLog({ events }: BlackBoxLogProps) {

@@ -157,7 +157,7 @@ export class SecurityMonitor {
       alerts.push({
         id: `cartel-${Date.now()}`,
         severity: 'critical',
-        type: 'cartel_detected',
+        type: 'cartel',
         message: `Cartel detected: ${cartelAnalysis.alignment.toFixed(1)}% voting alignment among validators`,
         affectedBubbles: ['global'],
         timestamp: new Date()
@@ -169,7 +169,7 @@ export class SecurityMonitor {
       alerts.push({
         id: `gini-${Date.now()}`,
         severity: 'high',
-        type: 'whale_capture',
+        type: 'capture',
         message: `High wealth concentration detected: Gini = ${gini.toFixed(2)}`,
         affectedBubbles: ['global'],
         timestamp: new Date()
@@ -181,7 +181,7 @@ export class SecurityMonitor {
       alerts.push({
         id: `censorship-${Date.now()}`,
         severity: 'high',
-        type: 'censorship_detected',
+        type: 'capture',
         message: `${censoredProposals.length} proposals not included in blocks after 2 minutes`,
         affectedBubbles: ['global'],
         timestamp: new Date()
@@ -194,7 +194,7 @@ export class SecurityMonitor {
       alerts.push({
         id: `bft-${Date.now()}`,
         severity: 'critical',
-        type: 'bft_threshold',
+        type: 'entropy',
         message: `Only ${activeValidators.length}/${validators.length} validators active (need ${bftThreshold} for BFT)`,
         affectedBubbles: ['global'],
         timestamp: new Date()

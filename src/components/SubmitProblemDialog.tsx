@@ -40,7 +40,8 @@ export function SubmitProblemDialog({ open, onOpenChange, bubbleId, onSubmit }: 
       description: description.trim(),
       priority: parseInt(priority),
       submittedAt: new Date(),
-      anonymous: true
+      anonymous: true,
+      attestations: 1
     }
 
     onSubmit(problem)

@@ -33,8 +33,10 @@ export function SubmitProposalDialog({ open, onOpenChange, bubbleId, problems, o
     const prediction: Prediction = {
       id: `pred-${Date.now()}-${predictions.length}`,
       metric: newPrediction.metric,
+      predictedValue: 0,
       predictedOutcome: newPrediction.predictedOutcome,
-      timeframe: newPrediction.timeframe
+      timeframe: newPrediction.timeframe,
+      settled: false
     }
 
     setPredictions([...predictions, prediction])
@@ -57,8 +59,10 @@ export function SubmitProposalDialog({ open, onOpenChange, bubbleId, problems, o
       predictions,
       validations: [],
       submittedAt: new Date(),
-      submittedBy: `anon-${Date.now()}`,
-      status: 'pending'
+      submittedBy: 'anonymous',
+      status: 'pending',
+      influenceBonded: 100,
+      realitySettled: false
     }
 
     onSubmit(proposal)
