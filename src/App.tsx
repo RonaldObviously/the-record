@@ -5,8 +5,9 @@ import { BubbleDashboard } from '@/components/BubbleDashboard'
 import { Header } from '@/components/Header'
 import { MetaAlertPanel } from '@/components/MetaAlertPanel'
 import { SystemMonitoring } from '@/components/SystemMonitoring'
+import { Globe3D } from '@/components/Globe3D'
 import { Button } from '@/components/ui/button'
-import { ChartLine } from '@phosphor-icons/react'
+import { ChartLine, Globe, MapTrifold } from '@phosphor-icons/react'
 import { 
   generateSeedBubbles, 
   generateSeedProblems, 
@@ -19,6 +20,7 @@ import type { Bubble, Problem, Proposal, BlackBoxEntry, MetaAlert } from '@/lib/
 function App() {
   const [selectedBubble, setSelectedBubble] = useState<Bubble | null>(null)
   const [showSystemMonitor, setShowSystemMonitor] = useState(false)
+  const [viewMode, setViewMode] = useState<'map' | 'globe'>('globe')
   const [bubbles, setBubbles] = useKV<Bubble[]>('bubbles', [])
   const [problems, setProblems] = useKV<Problem[]>('problems', [])
   const [proposals, setProposals] = useKV<Proposal[]>('proposals', [])
@@ -86,23 +88,46 @@ function App() {
             )}
             {showSystemMonitor && (
               <Button variant="ghost" onClick={() => setShowSystemMonitor(false)}>
-                ← Back to Bubbles
+                ← Back to {viewMode === 'globe' ? 'Globe' : 'Map'}
               </Button>
             )}
           </div>
           
-          {!showSystemMonitor && (
-            <Button 
-              variant="outline"
-              onClick={() => {
-                setShowSystemMonitor(true)
-                setSelectedBubble(null)
-              }}
-            >
-              <ChartLine size={16} className="mr-2" />
-              System Health
-            </Button>
-          )}
+          <div className="flex items-center gap-2">
+            {!showSystemMonitor && !selectedBubble && (
+              <div className="flex items-center gap-2 mr-4">
+                <Button
+                  variant={viewMode === 'map' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setViewMode('map')}
+                >
+                  <MapTrifold size={16} className="mr-2" />
+                  Map View
+                </Button>
+                <Button
+                  variant={viewMode === 'globe' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setViewMode('globe')}
+                >
+                  <Globe size={16} className="mr-2" />
+                  Globe View
+                </Button>
+              </div>
+            )}
+            
+            {!showSystemMonitor && (
+              <Button 
+                variant="outline"
+                onClick={() => {
+                  setShowSystemMonitor(true)
+                  setSelectedBubble(null)
+                }}
+              >
+                <ChartLine size={16} className="mr-2" />
+                System Health
+              </Button>
+            )}
+          </div>
         </div>
 
         {safeMetaAlerts.length > 0 && !showSystemMonitor && (
@@ -112,10 +137,19 @@ function App() {
         {showSystemMonitor ? (
           <SystemMonitoring proposals={safeProposals} blackBoxEntries={safeBlackBox} />
         ) : !selectedBubble ? (
-          <BubbleMap 
-            bubbles={safeBubbles}
-            onBubbleSelect={handleBubbleSelect}
-          />
+          viewMode === 'globe' ? (
+            <Globe3D
+              bubbles={safeBubbles}
+              problems={safeProblems}
+              proposals={safeProposals}
+              onBubbleSelect={handleBubbleSelect}
+            />
+          ) : (
+            <BubbleMap 
+              bubbles={safeBubbles}
+              onBubbleSelect={handleBubbleSelect}
+            />
+          )
         ) : (
           <BubbleDashboard
             bubble={selectedBubble}

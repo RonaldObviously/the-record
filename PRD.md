@@ -21,10 +21,18 @@ This is a sophisticated governance coordination platform with nested geographic/
 
 ## Essential Features
 
+**3D Globe View with Geographic Navigation**
+- Functionality: Interactive 3D Earth visualization displaying all bubbles as geographic markers with real-time status indicators, similar to Google Earth but representing Record system data
+- Purpose: Provide spatial context for all bubbles; enable intuitive geographic navigation; visualize global system health at a glance
+- Trigger: User selects "Globe View" toggle or app loads with globe as default
+- Progression: Globe loads with all bubbles as colored markers → User rotates/zooms globe → Hovers over marker to see bubble details → Clicks marker to drill into bubble dashboard → Can zoom from global to neighborhood level
+- Success criteria: Globe is performant with 50+ markers; markers color-coded by severity/status; smooth 3D rotation and zoom; tooltip shows bubble stats on hover; seamless transition to bubble detail view
+- Implementation: Three.js for 3D rendering, raycasting for marker interaction, dynamic marker colors based on alert status, geographic coordinate mapping for bubble positions
+
 **Bubble Map Navigation**
 - Functionality: Visual navigation system showing nested geographic (Global → City → Neighborhood) and thematic (Education, Healthcare, Infrastructure) bubbles
-- Purpose: Provide intuitive entry point into any community scale or problem domain
-- Trigger: User loads app or clicks a bubble to drill down
+- Purpose: Provide intuitive entry point into any community scale or problem domain; alternative flat view to globe
+- Trigger: User loads app or clicks a bubble to drill down; toggle to "Map View" from globe
 - Progression: Landing view shows bubble grid → User selects bubble → Zooms into sub-bubbles or domain dashboard → Can navigate back up hierarchy
 - Success criteria: Users can navigate from global to local context in under 3 clicks; bubble hierarchy is immediately comprehensible
 
