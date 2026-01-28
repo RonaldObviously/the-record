@@ -14,13 +14,19 @@ function App() {
   const [blackBox] = useKV<BlackBoxEntry[]>('blackbox', [])
   const [metaAlerts] = useKV<MetaAlert[]>('meta-alerts', [])
 
+  const safeBubbles = Array.isArray(bubbles) ? bubbles : []
+  const safeProblems = Array.isArray(problems) ? problems : []
+  const safeProposals = Array.isArray(proposals) ? proposals : []
+  const safeBlackBox = Array.isArray(blackBox) ? blackBox : []
+  const safeMetaAlerts = Array.isArray(metaAlerts) ? metaAlerts : []
+
   const handleBubbleSelect = (bubble: Bubble) => {
     setSelectedBubble(bubble)
   }
 
   const handleBack = () => {
     if (selectedBubble?.parentId) {
-      const parentBubble = (bubbles || []).find(b => b.id === selectedBubble.parentId)
+      const parentBubble = safeBubbles.find(b => b.id === selectedBubble.parentId)
       setSelectedBubble(parentBubble || null)
     } else {
       setSelectedBubble(null)
@@ -32,22 +38,22 @@ function App() {
       <Header />
       
       <main className="container mx-auto px-4 py-6 max-w-7xl">
-        {(metaAlerts || []).length > 0 && (
-          <MetaAlertPanel alerts={metaAlerts || []} />
+        {safeMetaAlerts.length > 0 && (
+          <MetaAlertPanel alerts={safeMetaAlerts} />
         )}
 
         {!selectedBubble ? (
           <BubbleMap 
-            bubbles={bubbles || []}
+            bubbles={safeBubbles}
             onBubbleSelect={handleBubbleSelect}
           />
         ) : (
           <BubbleDashboard
             bubble={selectedBubble}
-            bubbles={bubbles || []}
-            problems={(problems || []).filter(p => p.bubbleId === selectedBubble.id)}
-            proposals={(proposals || []).filter(p => p.bubbleId === selectedBubble.id)}
-            blackBoxEntries={(blackBox || []).filter(e => e.bubbleId === selectedBubble.id)}
+            bubbles={safeBubbles}
+            problems={safeProblems.filter(p => p.bubbleId === selectedBubble.id)}
+            proposals={safeProposals.filter(p => p.bubbleId === selectedBubble.id)}
+            blackBoxEntries={safeBlackBox.filter(e => e.bubbleId === selectedBubble.id)}
             onBack={handleBack}
             onBubbleSelect={handleBubbleSelect}
           />
