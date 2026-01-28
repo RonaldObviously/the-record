@@ -1,7 +1,11 @@
+import { useState, useMemo } from 'react'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
-import { CheckCircle, XCircle, WarningDiamond, Clock } from '@phosphor-icons/react'
+import { CheckCircle, XCircle, WarningDiamond, Clock, MagnifyingGlass } from '@phosphor-icons/react'
 import type { Proposal } from '@/lib/types'
 
 interface ProposalListProps {
@@ -10,6 +14,24 @@ interface ProposalListProps {
 }
 
 export function ProposalList({ proposals, view }: ProposalListProps) {
+  const [searchQuery, setSearchQuery] = useState('')
+  const [statusFilter, setStatusFilter] = useState<string>('all')
+
+  const statuses = useMemo(() => {
+    const stats = new Set(proposals.map(p => p.status))
+    return ['all', ...Array.from(stats)]
+  }, [proposals])
+
+  const filteredProposals = useMemo(() => {
+    return proposals.filter(p => {
+      const matchesSearch = searchQuery === '' || 
+        p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.description.toLowerCase().includes(searchQuery.toLowerCase())
+      const matchesStatus = statusFilter === 'all' || p.status === statusFilter
+      return matchesSearch && matchesStatus
+    })
+  }, [proposals, searchQuery, statusFilter])
+
   if (proposals.length === 0) {
     return (
       <div className="text-center py-12 text-muted-foreground">
@@ -21,89 +43,126 @@ export function ProposalList({ proposals, view }: ProposalListProps) {
 
   return (
     <div className="space-y-4">
-      {proposals.map(proposal => (
-        <Card key={proposal.id} className="p-4">
-          <div className="space-y-4">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex-1">
-                <h4 className="font-medium mb-1">{proposal.title}</h4>
-                <p className="text-sm text-muted-foreground">{proposal.description}</p>
-              </div>
-              <Badge variant={getStatusVariant(proposal.status)}>
-                {proposal.status}
-              </Badge>
-            </div>
+      <div className="flex flex-col sm:flex-row gap-2">
+        <div className="relative flex-1">
+          <MagnifyingGlass size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="Search proposals..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+        
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="w-full sm:w-[180px]">
+            <SelectValue placeholder="Status" />
+          </SelectTrigger>
+          <SelectContent>
+            {statuses.map(status => (
+              <SelectItem key={status} value={status} className="capitalize">
+                {status === 'all' ? 'All Status' : status}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
 
-            {view === 'validation' && (
-              <div className="space-y-3">
-                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                  Validation Results
-                </p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                  {proposal.validations.map((validation, idx) => (
-                    <div 
-                      key={idx}
-                      className={`flex items-center gap-2 p-2 rounded border ${getValidationBorderClass(validation.status)}`}
-                    >
-                      {getValidationIcon(validation.status)}
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-medium truncate">{validation.validator}</p>
-                        <p className="text-xs text-muted-foreground truncate">{validation.message}</p>
-                      </div>
-                    </div>
-                  ))}
+      <div className="text-xs text-muted-foreground">
+        Showing {filteredProposals.length} of {proposals.length} proposals
+      </div>
+
+      <div className="space-y-4">
+        {filteredProposals.map(proposal => (
+          <Card key={proposal.id} className="p-4 hover:shadow-md transition-shadow">
+            <div className="space-y-4">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex-1">
+                  <h4 className="font-medium mb-1">{proposal.title}</h4>
+                  <p className="text-sm text-muted-foreground">{proposal.description}</p>
                 </div>
+                <Badge variant={getStatusVariant(proposal.status)}>
+                  {proposal.status}
+                </Badge>
               </div>
-            )}
 
-            {view === 'accountability' && proposal.predictions.length > 0 && (
-              <Accordion type="single" collapsible>
-                <AccordionItem value="predictions">
-                  <AccordionTrigger className="text-sm">
-                    Prediction Tracking
-                    {proposal.accuracyScore !== undefined && (
-                      <Badge variant="outline" className="ml-2">
-                        Accuracy: {Math.round(proposal.accuracyScore * 100)}%
-                      </Badge>
-                    )}
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <div className="space-y-3 pt-2">
-                      {proposal.predictions.map((prediction, idx) => (
-                        <div key={idx} className="border-l-2 border-prediction pl-3 space-y-1">
-                          <p className="text-sm font-medium">{prediction.metric}</p>
-                          <div className="grid grid-cols-2 gap-2 text-xs">
-                            <div>
-                              <span className="text-muted-foreground">Predicted:</span>
-                              <span className="ml-2 font-mono">{prediction.predicted}</span>
-                            </div>
-                            <div>
-                              <span className="text-muted-foreground">Actual:</span>
-                              <span className="ml-2 font-mono">
-                                {prediction.actual || 'Pending'}
-                              </span>
-                            </div>
-                          </div>
-                          <p className="text-xs text-muted-foreground">
-                            Timeframe: {prediction.timeframe}
-                          </p>
+              {view === 'validation' && (
+                <div className="space-y-3">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    Validation Results
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    {proposal.validations.map((validation, idx) => (
+                      <div 
+                        key={idx}
+                        className={`flex items-center gap-2 p-2 rounded border ${getValidationBorderClass(validation.status)}`}
+                      >
+                        {getValidationIcon(validation.status)}
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-medium truncate">{validation.validator}</p>
+                          <p className="text-xs text-muted-foreground truncate">{validation.message}</p>
                         </div>
-                      ))}
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
-            )}
-
-            <div className="flex items-center justify-between text-xs text-muted-foreground">
-              <span className="font-mono">{new Date(proposal.timestamp).toLocaleString()}</span>
-              {proposal.influenceWeight !== undefined && (
-                <span>Influence Weight: <span className="font-mono">{proposal.influenceWeight.toFixed(2)}</span></span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               )}
+
+              {view === 'accountability' && proposal.predictions.length > 0 && (
+                <Accordion type="single" collapsible>
+                  <AccordionItem value="predictions">
+                    <AccordionTrigger className="text-sm">
+                      Prediction Tracking ({proposal.predictions.length})
+                      {proposal.accuracyScore !== undefined && (
+                        <Badge variant="outline" className="ml-2">
+                          Accuracy: {Math.round(proposal.accuracyScore * 100)}%
+                        </Badge>
+                      )}
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <div className="space-y-3 pt-2">
+                        {proposal.predictions.map((prediction, idx) => (
+                          <div key={idx} className="border-l-2 border-prediction pl-3 space-y-1">
+                            <p className="text-sm font-medium">{prediction.metric}</p>
+                            <div className="grid grid-cols-2 gap-2 text-xs">
+                              <div>
+                                <span className="text-muted-foreground">Predicted:</span>
+                                <span className="ml-2 font-mono">{prediction.predicted}</span>
+                              </div>
+                              <div>
+                                <span className="text-muted-foreground">Actual:</span>
+                                <span className="ml-2 font-mono">
+                                  {prediction.actual || 'Pending'}
+                                </span>
+                              </div>
+                            </div>
+                            <p className="text-xs text-muted-foreground">
+                              Timeframe: {prediction.timeframe}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+              )}
+
+              <div className="flex items-center justify-between text-xs text-muted-foreground">
+                <span className="font-mono">{new Date(proposal.timestamp).toLocaleString()}</span>
+                {proposal.influenceWeight !== undefined && (
+                  <span>Influence Weight: <span className="font-mono">{proposal.influenceWeight.toFixed(2)}</span></span>
+                )}
+              </div>
             </div>
-          </div>
-        </Card>
-      ))}
+          </Card>
+        ))}
+      </div>
+
+      {filteredProposals.length === 0 && (
+        <div className="text-center py-8 text-muted-foreground">
+          <p>No proposals match your filters.</p>
+        </div>
+      )}
     </div>
   )
 }

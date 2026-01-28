@@ -1,14 +1,15 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { ArrowLeft, LockKey, Network, Target, Eye, Plus } from '@phosphor-icons/react'
+import { ArrowLeft, LockKey, Network, Target, Eye, Plus, Download, ChartBar } from '@phosphor-icons/react'
 import { ProblemList } from '@/components/ProblemList'
 import { ProposalList } from '@/components/ProposalList'
 import { BlackBoxLog } from '@/components/BlackBoxLog'
 import { SubmitProblemDialog } from '@/components/SubmitProblemDialog'
 import { SubmitProposalDialog } from '@/components/SubmitProposalDialog'
+import { toast } from 'sonner'
 import type { Bubble, Problem, Proposal, BlackBoxEntry } from '@/lib/types'
 
 interface BubbleDashboardProps {
@@ -35,6 +36,70 @@ export function BubbleDashboard({
 
   const childBubbles = bubbles.filter(b => b.parentId === bubble.id)
 
+  const stats = useMemo(() => {
+    const totalProblems = problems.length
+    const totalProposals = proposals.length
+    const activeProposals = proposals.filter(p => p.status === 'active').length
+    const completedProposals = proposals.filter(p => p.status === 'completed').length
+    const validatingProposals = proposals.filter(p => p.status === 'validating').length
+    
+    const avgAccuracy = proposals
+      .filter(p => p.accuracyScore !== undefined)
+      .reduce((sum, p) => sum + (p.accuracyScore || 0), 0) / 
+      (proposals.filter(p => p.accuracyScore !== undefined).length || 1)
+
+    return {
+      totalProblems,
+      totalProposals,
+      activeProposals,
+      completedProposals,
+      validatingProposals,
+      avgAccuracy: Math.round(avgAccuracy * 100)
+    }
+  }, [problems, proposals])
+
+  const handleExportData = () => {
+    const exportData = {
+      bubble: {
+        id: bubble.id,
+        name: bubble.name,
+        type: bubble.type,
+        level: bubble.level,
+        domain: bubble.domain
+      },
+      statistics: stats,
+      problems: problems.map(p => ({
+        id: p.id,
+        category: p.category,
+        description: p.description,
+        priority: p.aggregatedPriority,
+        timestamp: new Date(p.timestamp).toISOString()
+      })),
+      proposals: proposals.map(p => ({
+        id: p.id,
+        title: p.title,
+        status: p.status,
+        predictions: p.predictions,
+        accuracyScore: p.accuracyScore,
+        timestamp: new Date(p.timestamp).toISOString()
+      })),
+      exportedAt: new Date().toISOString()
+    }
+
+    const dataStr = JSON.stringify(exportData, null, 2)
+    const dataBlob = new Blob([dataStr], { type: 'application/json' })
+    const url = URL.createObjectURL(dataBlob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `${bubble.id}-export-${Date.now()}.json`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+    
+    toast.success('Data exported successfully')
+  }
+
   const layers = [
     { id: 'L1', name: 'Private Consensus', icon: LockKey, color: 'text-primary' },
     { id: 'L2', name: 'Constraint Network', icon: Network, color: 'text-success' },
@@ -44,7 +109,7 @@ export function BubbleDashboard({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-4">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" onClick={onBack}>
             <ArrowLeft size={20} />
@@ -57,7 +122,11 @@ export function BubbleDashboard({
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          <Button onClick={handleExportData} variant="outline" size="sm">
+            <Download size={16} className="mr-2" />
+            Export Data
+          </Button>
           <Button onClick={() => setShowProblemDialog(true)}>
             <Plus size={16} className="mr-2" />
             Report Problem
@@ -69,10 +138,66 @@ export function BubbleDashboard({
         </div>
       </div>
 
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardDescription className="text-xs">Total Problems</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.totalProblems}</div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="pb-2">
+            <CardDescription className="text-xs">Total Proposals</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.totalProposals}</div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="pb-2">
+            <CardDescription className="text-xs">Validating</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-warning">{stats.validatingProposals}</div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="pb-2">
+            <CardDescription className="text-xs">Active</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-success">{stats.activeProposals}</div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="pb-2">
+            <CardDescription className="text-xs">Completed</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-prediction">{stats.completedProposals}</div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="pb-2">
+            <CardDescription className="text-xs">Avg Accuracy</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.avgAccuracy}%</div>
+          </CardContent>
+        </Card>
+      </div>
+
       {childBubbles.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Sub-Contexts</CardTitle>
+            <CardTitle className="text-base">Sub-Contexts ({childBubbles.length})</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-2">
@@ -80,10 +205,13 @@ export function BubbleDashboard({
                 <Badge 
                   key={child.id}
                   variant="outline"
-                  className="cursor-pointer hover:bg-muted"
+                  className="cursor-pointer hover:bg-muted transition-colors"
                   onClick={() => onBubbleSelect(child)}
                 >
                   {child.name}
+                  <span className="ml-2 text-xs opacity-60">
+                    {child.problemCount || 0} / {child.proposalCount || 0}
+                  </span>
                 </Badge>
               ))}
             </div>
