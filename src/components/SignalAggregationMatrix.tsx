@@ -16,6 +16,7 @@ import { Flame, MapPin, Users } from '@phosphor-icons/react'
 interface SignalAggregationMatrixProps {
   signals: Signal[]
   onClusterPromoted: (cluster: SignalCluster) => void
+  onCellClick?: (position: { x: number; y: number }) => void
 }
 
 interface FloatingSignal extends Signal {
@@ -29,11 +30,12 @@ const SIGNAL_SIZE = 40
 const CLUSTER_SIZE = 80
 const ANIMATION_SPEED = 0.5
 
-export function SignalAggregationMatrix({ signals, onClusterPromoted }: SignalAggregationMatrixProps) {
+export function SignalAggregationMatrix({ signals, onClusterPromoted, onCellClick }: SignalAggregationMatrixProps) {
   const [floatingSignals, setFloatingSignals] = useState<FloatingSignal[]>([])
   const [clusters, setClusters] = useState<SignalCluster[]>([])
   const containerRef = useRef<HTMLDivElement>(null)
   const animationFrameRef = useRef<number | null>(null)
+  const [hoveredCell, setHoveredCell] = useState<{ x: number; y: number } | null>(null)
 
   useEffect(() => {
     const container = containerRef.current
@@ -139,6 +141,42 @@ export function SignalAggregationMatrix({ signals, onClusterPromoted }: SignalAg
     return colors[category] || 'bg-gray-500/20 border-gray-500'
   }
 
+  const handleContainerClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!onCellClick) return
+    
+    const container = containerRef.current
+    if (!container) return
+
+    const rect = container.getBoundingClientRect()
+    const x = e.clientX - rect.left
+    const y = e.clientY - rect.top
+
+    const clickedOnSignal = floatingSignals.some(signal => {
+      const dx = signal.x - x
+      const dy = signal.y - y
+      return Math.sqrt(dx * dx + dy * dy) < SIGNAL_SIZE / 2
+    })
+
+    if (!clickedOnSignal) {
+      onCellClick({ x, y })
+    }
+  }
+
+  const handleContainerMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const container = containerRef.current
+    if (!container) return
+
+    const rect = container.getBoundingClientRect()
+    const x = e.clientX - rect.left
+    const y = e.clientY - rect.top
+
+    setHoveredCell({ x, y })
+  }
+
+  const handleContainerMouseLeave = () => {
+    setHoveredCell(null)
+  }
+
   return (
     <Card className="p-6">
       <div className="mb-4 flex items-center justify-between">
@@ -150,6 +188,12 @@ export function SignalAggregationMatrix({ signals, onClusterPromoted }: SignalAg
           <p className="text-sm text-muted-foreground">
             Watch raw signals cluster into collective truth. Critical mass = verified problem.
           </p>
+          {onCellClick && (
+            <p className="text-xs text-accent mt-1 flex items-center gap-1">
+              <MapPin size={14} weight="fill" />
+              Click anywhere in the mesh to submit a signal at that location
+            </p>
+          )}
         </div>
         <div className="flex items-center gap-4 text-sm">
           <div className="flex items-center gap-1.5">
@@ -165,8 +209,23 @@ export function SignalAggregationMatrix({ signals, onClusterPromoted }: SignalAg
 
       <div
         ref={containerRef}
-        className="relative w-full h-96 bg-background/40 border border-border rounded-lg overflow-hidden"
+        className="relative w-full h-96 bg-background/40 border border-border rounded-lg overflow-hidden cursor-crosshair"
+        onClick={handleContainerClick}
+        onMouseMove={handleContainerMouseMove}
+        onMouseLeave={handleContainerMouseLeave}
       >
+        {hoveredCell && onCellClick && (
+          <div
+            className="absolute pointer-events-none"
+            style={{
+              left: hoveredCell.x - 20,
+              top: hoveredCell.y - 20,
+            }}
+          >
+            <div className="w-10 h-10 rounded-full border-2 border-accent/40 bg-accent/10 animate-pulse" />
+          </div>
+        )}
+
         <AnimatePresence>
           {floatingSignals.map((signal) => (
             <motion.div

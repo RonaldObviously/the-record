@@ -165,6 +165,21 @@ function App() {
     setShowOnboarding(true)
   }
 
+  const handleMeshCellClick = (position: { x: number; y: number }) => {
+    if (!userAccount || !canSubmitSignals(userAccount)) {
+      toast.error('You need a humanity score of 30+ to submit signals')
+      return
+    }
+    
+    if (!selectedBubbleId) {
+      toast.error('Please select a bubble first')
+      return
+    }
+
+    setShowSignalDialog(true)
+    toast.info('Click to submit a signal at this mesh location')
+  }
+
   const criticalAlerts = safeMetaAlerts.filter(a => a.severity === 'critical' || a.severity === 'high')
 
   return (
@@ -296,6 +311,7 @@ function App() {
               <SignalAggregationMatrix
                 signals={bubbleSignals}
                 onClusterPromoted={handleClusterPromoted}
+                onCellClick={handleMeshCellClick}
               />
             )}
           </div>
@@ -341,6 +357,7 @@ function App() {
                     <SignalAggregationMatrix
                       signals={bubbleSignals}
                       onClusterPromoted={handleClusterPromoted}
+                      onCellClick={handleMeshCellClick}
                     />
                   </Card>
 
