@@ -22,6 +22,7 @@ import { WelcomeDialog } from '@/components/WelcomeDialog'
 import { CryptoTransparencyExplainer } from '@/components/CryptoTransparencyExplainer'
 import { CostBreakdown } from '@/components/CostBreakdown'
 import { DataIntegrityExplainer } from '@/components/DataIntegrityExplainer'
+import { InfluenceVsMoneyBreakdown } from '@/components/InfluenceVsMoneyBreakdown'
 import { initializeSystem } from '@/lib/seedData'
 import { promoteClusterToProblem } from '@/lib/signalLifecycle'
 import type { Bubble, Problem, Proposal, MetaAlert, BlackBoxEvent, Signal, SignalCluster } from '@/lib/types'
@@ -257,6 +258,7 @@ function App() {
               <SystemExplanation />
               <CryptoTransparencyExplainer />
               <DataIntegrityExplainer />
+              <InfluenceVsMoneyBreakdown />
               <Button
                 variant="outline"
                 size="sm"
