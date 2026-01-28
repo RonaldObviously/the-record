@@ -1,4 +1,5 @@
 import { createHash } from './crypto'
+import type { LocationProof } from './anti-vpn'
 
 export interface UserAccount {
   id: string
@@ -13,6 +14,12 @@ export interface UserAccount {
   username?: string
   email?: string
   phone?: string
+  locationProofs: LocationProof[]
+  deviceFingerprint?: string
+  browserFingerprint?: string
+  lastLocationVerification?: Date
+  vpnDetected: boolean
+  suspiciousActivityCount: number
 }
 
 export interface VerificationSignal {
@@ -48,6 +55,9 @@ export async function createAccount(): Promise<UserAccount> {
     verificationSignals: [],
     humanityScore: 0,
     influence: 100,
+    locationProofs: [],
+    vpnDetected: false,
+    suspiciousActivityCount: 0,
   }
 }
 

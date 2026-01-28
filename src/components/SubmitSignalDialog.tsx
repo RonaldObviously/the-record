@@ -21,7 +21,9 @@ import {
 import { ContextualHelp, helpContent } from '@/components/ContextualHelp'
 import type { Signal, ProblemCategory } from '@/lib/types'
 import { coordinatesToH3, h3ToLocation } from '@/lib/h3Service'
-import { MapPin, ShieldCheck, Eye, EyeSlash } from '@phosphor-icons/react'
+import { antiVPNService, type LocationProof } from '@/lib/anti-vpn'
+import { LocationVerificationExplainer } from '@/components/LocationVerificationExplainer'
+import { MapPin, ShieldCheck, ShieldWarning, Eye, EyeSlash, Info } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 
 interface SubmitSignalDialogProps {
@@ -61,6 +63,9 @@ export function SubmitSignalDialog({
     preselectedH3Cell ? '~500m radius' : ''
   )
   const [anonymous, setAnonymous] = useState(true)
+  const [locationProof, setLocationProof] = useState<LocationProof | null>(null)
+  const [showVerificationExplainer, setShowVerificationExplainer] = useState(false)
+  const [verifying, setVerifying] = useState(false)
 
   useEffect(() => {
     if (preselectedH3Cell) {
@@ -70,17 +75,18 @@ export function SubmitSignalDialog({
     }
   }, [preselectedH3Cell])
 
-  const handleGetLocation = () => {
+  const handleGetLocation = async () => {
     if (!navigator.geolocation) {
       toast.error('Geolocation not supported by browser')
       return
     }
 
     setUseLocation(true)
-    toast.loading('Getting your location...')
+    setVerifying(true)
+    toast.loading('Verifying your location...')
 
     navigator.geolocation.getCurrentPosition(
-      (position) => {
+      async (position) => {
         const { latitude, longitude } = position.coords
         setLocation({ lat: latitude, lng: longitude })
 
@@ -90,10 +96,27 @@ export function SubmitSignalDialog({
         const blurred = h3ToLocation(h3)
         setBlurredArea(`~${Math.round(blurred.boundary.length * 50)}m radius`)
 
+        const proof = await antiVPNService.createLocationProof(
+          'current-user',
+          latitude,
+          longitude,
+          h3
+        )
+        
+        setLocationProof(proof)
+        setVerifying(false)
         toast.dismiss()
-        toast.success('Location captured and blurred for privacy')
+
+        if (proof.isVPN || proof.isTor) {
+          toast.error('VPN or Tor detected - cannot verify location')
+        } else if (proof.consistencyScore < 50) {
+          toast.warning('Location verification weak - signal may have lower trust')
+        } else {
+          toast.success('Location verified with multi-layer proofs')
+        }
       },
       (error) => {
+        setVerifying(false)
         toast.dismiss()
         toast.error('Could not get location: ' + error.message)
         setUseLocation(false)
@@ -109,6 +132,11 @@ export function SubmitSignalDialog({
 
     if (!category) {
       toast.error('Please select a category')
+      return
+    }
+
+    if (locationProof && (locationProof.isVPN || locationProof.isTor)) {
+      toast.error('Cannot submit - VPN/Tor detected. Please disable and try again.')
       return
     }
 
@@ -134,6 +162,7 @@ export function SubmitSignalDialog({
     setLocation(null)
     setH3Cell('')
     setBlurredArea('')
+    setLocationProof(null)
     onOpenChange(false)
 
     toast.success('Signal submitted anonymously to The Record')
@@ -196,11 +225,16 @@ export function SubmitSignalDialog({
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Label>Location Privacy</Label>
-              {useLocation && h3Cell && (
-                <span className="text-xs text-muted-foreground">
-                  Blurred to {blurredArea}
-                </span>
-              )}
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowVerificationExplainer(true)}
+                className="gap-1 h-auto py-1"
+              >
+                <Info size={14} />
+                <span className="text-xs">Why verify?</span>
+              </Button>
             </div>
             
             {!useLocation ? (
@@ -209,26 +243,94 @@ export function SubmitSignalDialog({
                 variant="outline"
                 onClick={handleGetLocation}
                 className="w-full"
+                disabled={verifying}
               >
                 <MapPin size={16} className="mr-2" />
-                Add Location (H3 Blurred)
+                {verifying ? 'Verifying Location...' : 'Add Location (H3 Blurred)'}
               </Button>
             ) : (
-              <div className="p-3 bg-muted/40 rounded-lg border border-border">
-                <div className="flex items-center gap-2 text-sm mb-2">
-                  <ShieldCheck size={16} className="text-success" />
-                  <span className="font-medium text-success">
-                    {preselectedH3Cell ? 'Mesh Cell Selected from Map' : 'Location Privacy Enabled'}
-                  </span>
+              <div className="space-y-2">
+                <div className="p-3 bg-muted/40 rounded-lg border border-border">
+                  <div className="flex items-center gap-2 text-sm mb-2">
+                    {locationProof ? (
+                      locationProof.isVPN || locationProof.isTor ? (
+                        <ShieldWarning size={16} className="text-destructive" />
+                      ) : (
+                        <ShieldCheck size={16} className="text-success" />
+                      )
+                    ) : (
+                      <ShieldCheck size={16} className="text-success" />
+                    )}
+                    <span className={`font-medium ${
+                      locationProof?.isVPN || locationProof?.isTor
+                        ? 'text-destructive'
+                        : 'text-success'
+                    }`}>
+                      {preselectedH3Cell
+                        ? 'Mesh Cell Selected from Map'
+                        : locationProof?.isVPN || locationProof?.isTor
+                        ? 'VPN/Tor Detected'
+                        : 'Location Verified'}
+                    </span>
+                  </div>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    {preselectedH3Cell
+                      ? 'You selected this mesh cell from the satellite map. Your signal will be associated with this hexagonal area.'
+                      : locationProof?.isVPN || locationProof?.isTor
+                      ? 'Please disable VPN/Tor and try again. THE RECORD requires verified locations to prevent manipulation.'
+                      : `Your exact location has been cryptographically blurred to a ${blurredArea} hexagonal cell. This proves the signal is from this area without revealing your precise location.`}
+                  </p>
+                  <div className="font-mono text-[10px] text-muted-foreground break-all">
+                    H3 Cell: {h3Cell}
+                  </div>
                 </div>
-                <p className="text-xs text-muted-foreground mb-2">
-                  {preselectedH3Cell
-                    ? 'You selected this mesh cell from the satellite map. Your signal will be associated with this hexagonal area.'
-                    : `Your exact location has been cryptographically blurred to a ${blurredArea} hexagonal cell. This proves the signal is from this area without revealing your precise location.`}
-                </p>
-                <div className="font-mono text-[10px] text-muted-foreground break-all">
-                  H3 Cell: {h3Cell}
-                </div>
+
+                {locationProof && (
+                  <div className="p-2 bg-muted/20 rounded border border-border/50 space-y-1">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-muted-foreground">Consistency Score</span>
+                      <span className={`font-semibold ${
+                        locationProof.consistencyScore >= 70 ? 'text-success' :
+                        locationProof.consistencyScore >= 50 ? 'text-accent' :
+                        'text-destructive'
+                      }`}>
+                        {locationProof.consistencyScore}/100
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-muted-foreground">Trust Score</span>
+                      <span className={`font-semibold ${
+                        locationProof.trustScore >= 70 ? 'text-success' :
+                        locationProof.trustScore >= 50 ? 'text-accent' :
+                        'text-destructive'
+                      }`}>
+                        {locationProof.trustScore}/100
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {locationProof.timezoneMatch && (
+                        <span className="text-[10px] px-1.5 py-0.5 bg-success/20 text-success rounded">
+                          Timezone ✓
+                        </span>
+                      )}
+                      {!locationProof.isVPN && (
+                        <span className="text-[10px] px-1.5 py-0.5 bg-success/20 text-success rounded">
+                          No VPN ✓
+                        </span>
+                      )}
+                      {locationProof.isVPN && (
+                        <span className="text-[10px] px-1.5 py-0.5 bg-destructive/20 text-destructive rounded">
+                          VPN ✗
+                        </span>
+                      )}
+                      {locationProof.isTor && (
+                        <span className="text-[10px] px-1.5 py-0.5 bg-destructive/20 text-destructive rounded">
+                          Tor ✗
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -268,11 +370,20 @@ export function SubmitSignalDialog({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={handleSubmit}>
+          <Button 
+            onClick={handleSubmit}
+            disabled={locationProof?.isVPN || locationProof?.isTor}
+          >
             Submit Signal
           </Button>
         </DialogFooter>
       </DialogContent>
+
+      <LocationVerificationExplainer
+        open={showVerificationExplainer}
+        onOpenChange={setShowVerificationExplainer}
+        currentProof={locationProof || undefined}
+      />
     </Dialog>
   )
 }
