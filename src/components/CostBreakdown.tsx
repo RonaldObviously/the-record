@@ -16,7 +16,11 @@ import {
   TrendDown,
   Vault,
   Users,
-  Lightning
+  Lightning,
+  ArrowRight,
+  ArrowsOutCardinal,
+  Pulse,
+  Globe
 } from '@phosphor-icons/react'
 
 export function CostBreakdown() {
@@ -30,6 +34,12 @@ export function CostBreakdown() {
           Complete breakdown of how The Record makes money, stores it, and distributes it
         </p>
       </div>
+
+      <ServerScalingVisualization />
+
+      <AutoScalingVisualization />
+
+      <EconomicFlowDiagram />
 
       <Card className="p-6 bg-primary/10 border-primary">
         <div className="flex items-start gap-4">
@@ -202,6 +212,436 @@ export function CostBreakdown() {
       
       <Weaknesses />
     </div>
+  )
+}
+
+function ServerScalingVisualization() {
+  const scales = [
+    {
+      name: 'Small',
+      users: '1K',
+      userCount: 1000,
+      servers: 3,
+      cost: '$600/yr',
+      perUser: '$0.60',
+      color: 'bg-success',
+      nodes: ['User Browser', 'IPFS Pin', 'BFT Node 1', 'BFT Node 2', 'BFT Node 3']
+    },
+    {
+      name: 'Medium',
+      users: '100K',
+      userCount: 100000,
+      servers: 5,
+      cost: '$3.5K/yr',
+      perUser: '$0.035',
+      color: 'bg-primary',
+      nodes: ['User Browsers', 'IPFS Cluster', 'Validator 1', 'Validator 2', 'Validator 3', 'Validator 4', 'Validator 5', 'CDN']
+    },
+    {
+      name: 'Large',
+      users: '10M',
+      userCount: 10000000,
+      servers: 15,
+      cost: '$77K/yr',
+      perUser: '$0.0077',
+      color: 'bg-accent',
+      nodes: ['P2P Network', 'IPFS Global', 'Val 1-5', 'Val 6-10', 'Val 11-15', 'DB Cluster', 'Monitoring']
+    },
+    {
+      name: 'Global',
+      users: '100M+',
+      userCount: 100000000,
+      servers: 100,
+      cost: '$840K/yr',
+      perUser: '$0.0084',
+      color: 'bg-destructive',
+      nodes: ['Worldwide P2P', 'IPFS 50 Nodes', 'Val Network', 'DB Shards', 'CDN Edge', 'Security']
+    }
+  ]
+
+  return (
+    <Card className="p-6">
+      <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+        <ArrowsOutCardinal size={28} className="text-accent" />
+        Server Scaling Architecture
+      </h2>
+      <p className="text-sm text-muted-foreground mb-6">
+        Watch how infrastructure scales logarithmically, not linearly. As users increase 100x, costs only increase 10-20x.
+      </p>
+
+      <div className="space-y-8">
+        {scales.map((scale, idx) => (
+          <div key={scale.name} className="space-y-3">
+            <div className="flex items-center gap-4">
+              <div className="flex-shrink-0 w-32">
+                <div className="text-lg font-bold">{scale.name}</div>
+                <div className="text-sm text-muted-foreground">{scale.users} users</div>
+              </div>
+              
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <Users size={16} />
+                  <div className="flex-1 bg-secondary rounded-full h-6 relative overflow-hidden">
+                    <div 
+                      className={`${scale.color} h-full flex items-center justify-center text-xs font-bold text-background transition-all duration-500`}
+                      style={{ width: `${Math.min((scale.userCount / 100000000) * 100, 100)}%` }}
+                    >
+                      {scale.userCount.toLocaleString()}
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-6 gap-2">
+                  {scale.nodes.map((node, nodeIdx) => (
+                    <div 
+                      key={nodeIdx}
+                      className="bg-secondary/50 border border-border rounded p-2 text-xs text-center"
+                    >
+                      <Cloud size={16} className="mx-auto mb-1 text-accent" />
+                      <div className="truncate">{node}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="flex-shrink-0 w-40 text-right">
+                <div className="text-xl font-bold">{scale.cost}</div>
+                <div className="text-sm text-success">{scale.perUser}/user</div>
+                <div className="text-xs text-muted-foreground">{scale.servers} servers</div>
+              </div>
+            </div>
+            
+            {idx < scales.length - 1 && (
+              <div className="flex items-center gap-2 text-muted-foreground text-sm pl-32">
+                <ArrowRight size={16} />
+                <span>
+                  {((scales[idx + 1].userCount / scale.userCount)).toFixed(0)}x users = 
+                  {' '}{(parseFloat(scales[idx + 1].cost.replace(/[^0-9.]/g, '')) / parseFloat(scale.cost.replace(/[^0-9.]/g, ''))).toFixed(1)}x cost
+                  {' '}({(100 / (scales[idx + 1].userCount / scale.userCount)).toFixed(0)}% efficiency gain)
+                </span>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-6 p-4 bg-accent/10 rounded-lg border border-accent">
+        <h3 className="font-bold mb-2 flex items-center gap-2">
+          <Pulse size={20} className="text-accent" />
+          Logarithmic Scaling Explained
+        </h3>
+        <p className="text-sm text-muted-foreground mb-3">
+          Traditional centralized systems scale <strong>linearly</strong>: 100x users = 100x cost. 
+          The Record scales <strong>logarithmically</strong> because:
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+          <div className="flex items-start gap-2">
+            <CheckCircle size={16} className="text-success flex-shrink-0 mt-0.5" />
+            <span>User data lives on their devices (P2P)</span>
+          </div>
+          <div className="flex items-start gap-2">
+            <CheckCircle size={16} className="text-success flex-shrink-0 mt-0.5" />
+            <span>IPFS distributes storage across network</span>
+          </div>
+          <div className="flex items-start gap-2">
+            <CheckCircle size={16} className="text-success flex-shrink-0 mt-0.5" />
+            <span>BFT needs only √n validators (not n)</span>
+          </div>
+          <div className="flex items-start gap-2">
+            <CheckCircle size={16} className="text-success flex-shrink-0 mt-0.5" />
+            <span>Static frontend (no server rendering)</span>
+          </div>
+        </div>
+      </div>
+    </Card>
+  )
+}
+
+function AutoScalingVisualization() {
+  return (
+    <Card className="p-6">
+      <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+        <Globe size={28} className="text-primary" />
+        Automatic Server Scaling System
+      </h2>
+      <p className="text-sm text-muted-foreground mb-6">
+        The Record automatically provisions new servers when demand increases and scales down during low usage periods.
+      </p>
+
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="p-5 bg-success/10 rounded-lg border border-success/30">
+            <h3 className="font-bold mb-3 flex items-center gap-2">
+              <TrendUp size={20} className="text-success" />
+              Scale-Up Triggers
+            </h3>
+            <div className="space-y-3 text-sm">
+              <div className="p-3 bg-background/80 rounded">
+                <div className="font-semibold mb-1">User Growth</div>
+                <div className="text-xs text-muted-foreground">When active users increase &gt; 20% in 7 days</div>
+                <div className="mt-2 font-mono text-xs">
+                  <div>Current: 50K users</div>
+                  <div className="text-success">→ New: 65K users (+30%)</div>
+                  <div className="text-accent">→ Add 2 validator nodes</div>
+                </div>
+              </div>
+
+              <div className="p-3 bg-background/80 rounded">
+                <div className="font-semibold mb-1">Storage Pressure</div>
+                <div className="text-xs text-muted-foreground">When IPFS storage &gt; 80% capacity</div>
+                <div className="mt-2 font-mono text-xs">
+                  <div>Current: 420 GB / 500 GB (84%)</div>
+                  <div className="text-success">→ Trigger: Add IPFS node</div>
+                  <div className="text-accent">→ New capacity: 1 TB</div>
+                </div>
+              </div>
+
+              <div className="p-3 bg-background/80 rounded">
+                <div className="font-semibold mb-1">Validator Load</div>
+                <div className="text-xs text-muted-foreground">When avg validation time &gt; 5 seconds</div>
+                <div className="mt-2 font-mono text-xs">
+                  <div>Current: 6.2s avg validation</div>
+                  <div className="text-success">→ Trigger: Add validator</div>
+                  <div className="text-accent">→ New avg: 3.1s (2x faster)</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="p-5 bg-destructive/10 rounded-lg border border-destructive/30">
+            <h3 className="font-bold mb-3 flex items-center gap-2">
+              <TrendDown size={20} className="text-destructive" />
+              Scale-Down Triggers
+            </h3>
+            <div className="space-y-3 text-sm">
+              <div className="p-3 bg-background/80 rounded">
+                <div className="font-semibold mb-1">Low Activity Period</div>
+                <div className="text-xs text-muted-foreground">When usage &lt; 40% capacity for 30+ days</div>
+                <div className="mt-2 font-mono text-xs">
+                  <div>Current: 30% usage (15K/50K users)</div>
+                  <div className="text-destructive">→ Trigger: Remove 2 validators</div>
+                  <div className="text-accent">→ Save $100/month</div>
+                </div>
+              </div>
+
+              <div className="p-3 bg-background/80 rounded">
+                <div className="font-semibold mb-1">Storage Efficiency</div>
+                <div className="text-xs text-muted-foreground">When storage &lt; 30% used for 60+ days</div>
+                <div className="mt-2 font-mono text-xs">
+                  <div>Current: 150 GB / 1 TB (15%)</div>
+                  <div className="text-destructive">→ Trigger: Consolidate to 500GB</div>
+                  <div className="text-accent">→ Save $30/month</div>
+                </div>
+              </div>
+
+              <div className="p-3 bg-background/80 rounded">
+                <div className="font-semibold mb-1">Validator Idle Time</div>
+                <div className="text-xs text-muted-foreground">When validators process &lt; 10 validations/day</div>
+                <div className="mt-2 font-mono text-xs">
+                  <div>Validator-7: 4 validations/day avg</div>
+                  <div className="text-destructive">→ Trigger: Decommission</div>
+                  <div className="text-accent">→ Save $60/month</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-5 bg-accent/10 rounded-lg border border-accent">
+          <h3 className="font-bold mb-3 flex items-center gap-2">
+            <Lightning size={20} className="text-accent" />
+            Automatic Provisioning Flow
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 text-sm">
+            <div className="p-3 bg-background/80 rounded text-center">
+              <div className="font-bold mb-2">1. Monitor</div>
+              <Pulse size={32} className="mx-auto text-accent mb-2" />
+              <div className="text-xs text-muted-foreground">System tracks metrics every 60s</div>
+            </div>
+            <div className="flex items-center justify-center">
+              <ArrowRight size={24} className="text-muted-foreground" />
+            </div>
+            <div className="p-3 bg-background/80 rounded text-center">
+              <div className="font-bold mb-2">2. Detect</div>
+              <WarningCircle size={32} className="mx-auto text-accent mb-2" />
+              <div className="text-xs text-muted-foreground">Threshold crossed</div>
+            </div>
+            <div className="flex items-center justify-center">
+              <ArrowRight size={24} className="text-muted-foreground" />
+            </div>
+            <div className="p-3 bg-background/80 rounded text-center">
+              <div className="font-bold mb-2">3. Provision</div>
+              <Cloud size={32} className="mx-auto text-success mb-2" />
+              <div className="text-xs text-muted-foreground">New server spins up in &lt; 5min</div>
+            </div>
+          </div>
+          <div className="mt-4 p-3 bg-background/80 rounded">
+            <div className="text-xs font-mono space-y-1">
+              <div className="text-muted-foreground">// Kubernetes auto-scaling example</div>
+              <div>kubectl scale deployment validators --replicas=<span className="text-accent">7</span></div>
+              <div className="text-success">→ New validator pod starting...</div>
+              <div className="text-success">→ Health check passed ✓</div>
+              <div className="text-success">→ Joined BFT consensus network ✓</div>
+              <div className="text-success">→ Now processing validations ✓</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-5 bg-primary/10 rounded-lg border border-primary">
+          <h3 className="font-bold mb-3">Cost Impact of Auto-Scaling</h3>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border">
+                  <th className="text-left p-2">Scenario</th>
+                  <th className="text-right p-2">Fixed Capacity</th>
+                  <th className="text-right p-2">Auto-Scaling</th>
+                  <th className="text-right p-2">Savings</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="border-b border-border/50">
+                  <td className="p-2">Peak usage (10K users)</td>
+                  <td className="text-right p-2 font-mono">$300/mo</td>
+                  <td className="text-right p-2 font-mono">$300/mo</td>
+                  <td className="text-right p-2 font-mono text-muted-foreground">$0</td>
+                </tr>
+                <tr className="border-b border-border/50">
+                  <td className="p-2">Normal usage (6K users)</td>
+                  <td className="text-right p-2 font-mono">$300/mo</td>
+                  <td className="text-right p-2 font-mono text-success">$180/mo</td>
+                  <td className="text-right p-2 font-mono text-success">-$120</td>
+                </tr>
+                <tr className="border-b border-border/50">
+                  <td className="p-2">Low usage (2K users)</td>
+                  <td className="text-right p-2 font-mono">$300/mo</td>
+                  <td className="text-right p-2 font-mono text-success">$80/mo</td>
+                  <td className="text-right p-2 font-mono text-success">-$220</td>
+                </tr>
+                <tr className="bg-success/20 font-bold">
+                  <td className="p-2">Average annual savings</td>
+                  <td className="text-right p-2 font-mono">$3,600</td>
+                  <td className="text-right p-2 font-mono text-success">$2,040</td>
+                  <td className="text-right p-2 font-mono text-success">-$1,560 (43%)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </Card>
+  )
+}
+
+function EconomicFlowDiagram() {
+  return (
+    <Card className="p-6">
+      <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+        <ArrowsClockwise size={28} className="text-primary" />
+        Economic Flow: Money In → Storage → Money Out
+      </h2>
+      
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="space-y-4">
+          <div className="text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-success/20 mb-3">
+              <TrendUp size={32} className="text-success" />
+            </div>
+            <h3 className="font-bold text-lg mb-2">Money Comes In</h3>
+          </div>
+          <div className="space-y-2">
+            <div className="p-3 bg-success/10 rounded border border-success/30">
+              <div className="font-semibold text-sm mb-1">Influence Slashing</div>
+              <div className="text-xs text-muted-foreground">70-80% of revenue</div>
+              <div className="text-lg font-bold text-success mt-1">$$$</div>
+            </div>
+            <div className="p-3 bg-primary/10 rounded border border-primary/30">
+              <div className="font-semibold text-sm mb-1">Professional Fees</div>
+              <div className="text-xs text-muted-foreground">10-20% of revenue</div>
+              <div className="text-lg font-bold text-primary mt-1">$$</div>
+            </div>
+            <div className="p-3 bg-accent/10 rounded border border-accent/30">
+              <div className="font-semibold text-sm mb-1">Priority Fees</div>
+              <div className="text-xs text-muted-foreground">5-10% of revenue</div>
+              <div className="text-lg font-bold text-accent mt-1">$</div>
+            </div>
+            <div className="p-3 bg-secondary/50 rounded border border-border">
+              <div className="font-semibold text-sm mb-1">Grants & Donations</div>
+              <div className="text-xs text-muted-foreground">Bootstrap phase</div>
+              <div className="text-lg font-bold mt-1">$$$</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-4 flex flex-col justify-center">
+          <div className="text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-accent/20 mb-3">
+              <Vault size={32} className="text-accent" />
+            </div>
+            <h3 className="font-bold text-lg mb-2">Stored Securely</h3>
+          </div>
+          <div className="p-4 bg-accent/10 rounded-lg border border-accent text-center">
+            <div className="font-semibold mb-2">Multi-Sig Treasury</div>
+            <div className="text-xs text-muted-foreground mb-3">3-of-5 signatures required</div>
+            <div className="space-y-2 text-xs">
+              <div className="flex items-center justify-between p-2 bg-background/80 rounded">
+                <span>Reserve Target</span>
+                <span className="font-bold">6-12 months</span>
+              </div>
+              <div className="flex items-center justify-between p-2 bg-background/80 rounded">
+                <span>USDC</span>
+                <span className="font-bold">40%</span>
+              </div>
+              <div className="flex items-center justify-between p-2 bg-background/80 rounded">
+                <span>DAI</span>
+                <span className="font-bold">40%</span>
+              </div>
+              <div className="flex items-center justify-between p-2 bg-background/80 rounded">
+                <span>ETH/BTC</span>
+                <span className="font-bold">20%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <div className="text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/20 mb-3">
+              <TrendDown size={32} className="text-primary" />
+            </div>
+            <h3 className="font-bold text-lg mb-2">Money Goes Out</h3>
+          </div>
+          <div className="space-y-2">
+            <div className="p-3 bg-primary/10 rounded border border-primary/30">
+              <div className="font-semibold text-sm mb-1">Infrastructure</div>
+              <div className="text-xs text-muted-foreground">Servers, IPFS, DB</div>
+              <div className="text-lg font-bold text-primary mt-1">60%</div>
+            </div>
+            <div className="p-3 bg-success/10 rounded border border-success/30">
+              <div className="font-semibold text-sm mb-1">Validators</div>
+              <div className="text-xs text-muted-foreground">Node operators</div>
+              <div className="text-lg font-bold text-success mt-1">25%</div>
+            </div>
+            <div className="p-3 bg-accent/10 rounded border border-accent/30">
+              <div className="font-semibold text-sm mb-1">Development</div>
+              <div className="text-xs text-muted-foreground">Maintenance</div>
+              <div className="text-lg font-bold text-accent mt-1">10%</div>
+            </div>
+            <div className="p-3 bg-secondary/50 rounded border border-border">
+              <div className="font-semibold text-sm mb-1">Reserve</div>
+              <div className="text-xs text-muted-foreground">Emergency fund</div>
+              <div className="text-lg font-bold mt-1">5%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-6 flex items-center justify-center gap-4 text-sm text-muted-foreground">
+        <ArrowRight size={20} />
+        <span>Transparent • Auditable • Community Controlled</span>
+        <ArrowRight size={20} />
+      </div>
+    </Card>
   )
 }
 
