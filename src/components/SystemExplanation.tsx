@@ -27,6 +27,7 @@ import {
 } from '@phosphor-icons/react'
 import { SignalFlowDiagram } from '@/components/SignalFlowDiagram'
 import { LiveSignalFlowDemo } from '@/components/LiveSignalFlowDemo'
+import { SignalToProblemVisual } from '@/components/SignalToProblemVisual'
 
 export function SystemExplanation() {
   const [open, setOpen] = useState(false)
@@ -51,9 +52,10 @@ export function SystemExplanation() {
 
         <div className="flex-1 overflow-y-auto px-6 pr-4">
           <Tabs defaultValue="intro" className="w-full pb-4">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="intro">Overview</TabsTrigger>
             <TabsTrigger value="how">How It Works</TabsTrigger>
+            <TabsTrigger value="visual">Visual Flow</TabsTrigger>
             <TabsTrigger value="flow">Signal Flow</TabsTrigger>
             <TabsTrigger value="demo">Live Demo</TabsTrigger>
             <TabsTrigger value="why">Why Different</TabsTrigger>
@@ -226,6 +228,10 @@ export function SystemExplanation() {
                 </Card>
               </div>
             </div>
+          </TabsContent>
+
+          <TabsContent value="visual" className="space-y-6 mt-6">
+            <SignalToProblemVisual />
           </TabsContent>
 
           <TabsContent value="flow" className="space-y-6 mt-6">
