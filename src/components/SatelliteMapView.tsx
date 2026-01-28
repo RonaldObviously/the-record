@@ -22,18 +22,22 @@ interface SignalWithLocation extends Signal {
   location: { lat: number; lng: number }
 }
 
-function MapUpdater({ signalsWithLocations }: { signalsWithLocations: SignalWithLocation[] }) {
+function MapUpdater({ 
+  signalsWithLocations, 
+  userLocation 
+}: { 
+  signalsWithLocations: SignalWithLocation[]
+  userLocation: { lat: number; lng: number } | null
+}) {
   const map = useMap()
+  const [hasInitialized, setHasInitialized] = useState(false)
   
   useEffect(() => {
-    if (signalsWithLocations.length > 0) {
-      const bounds = signalsWithLocations.map(s => [s.location.lat, s.location.lng] as [number, number])
-      
-      if (bounds.length > 0) {
-        map.fitBounds(bounds, { padding: [50, 50], maxZoom: 12 })
-      }
+    if (!hasInitialized && userLocation) {
+      map.setView([userLocation.lat, userLocation.lng], 13)
+      setHasInitialized(true)
     }
-  }, [signalsWithLocations, map])
+  }, [userLocation, map, hasInitialized])
   
   return null
 }
@@ -177,7 +181,7 @@ export function SatelliteMapView({ signals, clusters = [], onSignalClick, onClus
             url='https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
           />
           
-          <MapUpdater signalsWithLocations={signalsWithLocations} />
+          <MapUpdater signalsWithLocations={signalsWithLocations} userLocation={userLocation} />
           
           {showHeatMap && (
             <HeatMapLayer 
