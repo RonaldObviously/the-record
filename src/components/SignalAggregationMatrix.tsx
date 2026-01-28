@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { ContextualHelp, helpContent } from '@/components/ContextualHelp'
 import type { Signal, SignalCluster } from '@/lib/types'
 import {
   clusterSignals,
@@ -142,9 +143,12 @@ export function SignalAggregationMatrix({ signals, onClusterPromoted }: SignalAg
     <Card className="p-6">
       <div className="mb-4 flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold">Live Signal Aggregation</h3>
+          <div className="flex items-center gap-2">
+            <h3 className="text-lg font-semibold">Live Signal Aggregation</h3>
+            <ContextualHelp {...helpContent.clustering} />
+          </div>
           <p className="text-sm text-muted-foreground">
-            Watch raw signals cluster into priority units
+            Watch raw signals cluster into collective truth. Critical mass = verified problem.
           </p>
         </div>
         <div className="flex items-center gap-4 text-sm">

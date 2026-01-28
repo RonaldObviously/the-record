@@ -18,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { ContextualHelp, helpContent } from '@/components/ContextualHelp'
 import type { Signal, ProblemCategory } from '@/lib/types'
 import { coordinatesToH3, h3ToLocation } from '@/lib/h3Service'
 import { MapPin, ShieldCheck, Eye, EyeSlash } from '@phosphor-icons/react'
@@ -130,11 +131,23 @@ export function SubmitSignalDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle>Submit Anonymous Signal</DialogTitle>
+          <DialogTitle className="flex items-center gap-2">
+            Submit Signal
+            <ContextualHelp {...helpContent.signals} />
+          </DialogTitle>
           <DialogDescription>
-            Report an observed problem. Your identity is protected through cryptographic blurring.
+            Report an issue or observation in this area. Your submission is anonymous and uses H3
+            geospatial blurring to protect your privacy.
           </DialogDescription>
         </DialogHeader>
+        
+        <div className="bg-accent/10 border border-accent/30 p-3 rounded-lg mb-4">
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            <strong className="text-foreground">Why anonymous?</strong> Private input prevents
+            groupthink, social pressure, and retaliation. Your signal will be clustered with others
+            to form collective truth without revealing individual identities.
+          </p>
+        </div>
 
         <div className="space-y-4 py-4">
           <div className="space-y-2">

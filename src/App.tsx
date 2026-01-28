@@ -16,6 +16,8 @@ import { GlobeVisualization } from '@/components/GlobeVisualization'
 import { BlackBoxLog } from '@/components/BlackBoxLog'
 import { OnboardingFlow } from '@/components/OnboardingFlow'
 import { AccountDashboard } from '@/components/AccountDashboard'
+import { SystemExplanation } from '@/components/SystemExplanation'
+import { WelcomeDialog } from '@/components/WelcomeDialog'
 import { initializeSystem } from '@/lib/seedData'
 import { promoteClusterToProblem } from '@/lib/signalLifecycle'
 import type { Bubble, Problem, Proposal, MetaAlert, BlackBoxEvent, Signal, SignalCluster } from '@/lib/types'
@@ -40,6 +42,7 @@ function App() {
   const [showProposalDialog, setShowProposalDialog] = useState(false)
   const [showSystemHealth, setShowSystemHealth] = useState(false)
   const [showOnboarding, setShowOnboarding] = useState(false)
+  const [showWelcome, setShowWelcome] = useState(false)
   const [showAccountDashboard, setShowAccountDashboard] = useState(false)
   const [showGlobeView, setShowGlobeView] = useState(false)
   const [currentLayer, setCurrentLayer] = useState<'L1' | 'L2' | 'L3' | 'L4'>('L1')
@@ -60,7 +63,7 @@ function App() {
 
   useEffect(() => {
     if (!userAccount && initialized) {
-      setShowOnboarding(true)
+      setShowWelcome(true)
     }
   }, [userAccount, initialized])
 
@@ -151,7 +154,13 @@ function App() {
   const handleOnboardingComplete = (account: UserAccount) => {
     setUserAccount(account)
     setShowOnboarding(false)
+    setShowWelcome(false)
     toast.success(`Welcome to THE RECORD, ${account.id}!`)
+  }
+
+  const handleStartOnboarding = () => {
+    setShowWelcome(false)
+    setShowOnboarding(true)
   }
 
   const criticalAlerts = safeMetaAlerts.filter(a => a.severity === 'critical' || a.severity === 'high')
@@ -168,6 +177,7 @@ function App() {
               </p>
             </div>
             <div className="flex items-center gap-3">
+              <SystemExplanation />
               {userAccount && (
                 <Button
                   variant="outline"
@@ -213,7 +223,7 @@ function App() {
                 </>
               )}
               {!userAccount && (
-                <Button size="sm" onClick={() => setShowOnboarding(true)}>
+                <Button size="sm" onClick={() => setShowWelcome(true)}>
                   Create Account
                 </Button>
               )}
@@ -415,6 +425,7 @@ function App() {
         </>
       )}
 
+      <WelcomeDialog open={showWelcome} onGetStarted={handleStartOnboarding} />
       <OnboardingFlow open={showOnboarding} onComplete={handleOnboardingComplete} />
     </div>
   )

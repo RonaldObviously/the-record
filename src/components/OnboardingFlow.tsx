@@ -202,19 +202,28 @@ export function OnboardingFlow({ open, onComplete }: OnboardingFlowProps) {
               </div>
             </div>
             <div className="space-y-3">
+              <div className="bg-accent/10 border border-accent/30 p-4 rounded-lg space-y-2">
+                <p className="text-sm font-semibold text-foreground">Why cryptographic keys?</p>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  Unlike traditional systems where a central authority controls your identity, THE RECORD
+                  gives you <strong>sovereign ownership</strong>. Your private key proves you're you
+                  without revealing personal information. No one can take it, forge it, or use it without
+                  your permission.
+                </p>
+              </div>
               <p className="text-sm text-muted-foreground text-center">
-                Your cryptographic identity is the foundation of your participation in THE RECORD.
-                This generates a unique Ed25519 key pair that only you control.
+                This generates a unique Ed25519 key pair that only you control. Think of it like a
+                mathematical passport that can't be faked or stolen.
               </p>
               <div className="bg-muted/50 p-4 rounded-lg space-y-2">
                 <p className="text-xs font-mono text-foreground/70">
-                  ⚡ Zero-knowledge privacy
+                  ⚡ Zero-knowledge privacy - Anonymous but verifiable
                 </p>
                 <p className="text-xs font-mono text-foreground/70">
-                  🔒 Cryptographically signed attestations
+                  🔒 Cryptographically signed attestations - Cannot be forged
                 </p>
                 <p className="text-xs font-mono text-foreground/70">
-                  ✨ Non-transferable influence
+                  ✨ Non-transferable influence - Can't be bought or sold
                 </p>
               </div>
             </div>
@@ -232,6 +241,15 @@ export function OnboardingFlow({ open, onComplete }: OnboardingFlowProps) {
               <EnvelopeSimple size={64} className="text-primary" weight="duotone" />
             </div>
             <div className="space-y-3">
+              <div className="bg-accent/10 border border-accent/30 p-4 rounded-lg space-y-2">
+                <p className="text-sm font-semibold text-foreground">Why email verification?</p>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  We prevent <strong>Sybil attacks</strong> (one person creating 1000 fake accounts) by
+                  requiring multiple independent signals of humanity. Email is one signal. Your email is{' '}
+                  <strong>never public</strong> and never used for marketing. It only increases your
+                  humanity score.
+                </p>
+              </div>
               <Label htmlFor="email">Email Address</Label>
               <Input
                 id="email"
@@ -242,7 +260,7 @@ export function OnboardingFlow({ open, onComplete }: OnboardingFlowProps) {
                 onKeyDown={(e) => e.key === 'Enter' && handleVerifyEmail()}
               />
               <p className="text-xs text-muted-foreground">
-                We use your email to prevent Sybil attacks. Your email is never public.
+                Adds +15 to your humanity score. Total privacy guaranteed.
               </p>
             </div>
             <div className="flex gap-3">
@@ -260,14 +278,25 @@ export function OnboardingFlow({ open, onComplete }: OnboardingFlowProps) {
               <MapPin size={64} className="text-primary" weight="duotone" />
             </div>
             <div className="space-y-3">
+              <div className="bg-accent/10 border border-accent/30 p-4 rounded-lg space-y-2">
+                <p className="text-sm font-semibold text-foreground">Why location?</p>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  THE RECORD uses <strong>H3 hexagonal geospatial indexing</strong>. Instead of storing
+                  your exact GPS coordinates (37.7749°, -122.4194°), we convert it to a hexagonal cell ID
+                  that covers ~500 meters. This proves you're in an area <strong>without revealing your
+                  exact address</strong>. You can report local problems safely.
+                </p>
+              </div>
               <p className="text-sm text-muted-foreground text-center">
-                Set your home location to see relevant local signals and problems. We use H3
-                geospatial indexing to protect your privacy - we never store exact coordinates.
+                See relevant local signals without sacrificing privacy.
               </p>
               {location && (
-                <div className="bg-accent/10 border border-accent/30 p-3 rounded-lg">
-                  <p className="text-xs font-mono text-center">
-                    📍 Location: {location.lat.toFixed(4)}, {location.lng.toFixed(4)}
+                <div className="bg-success/10 border border-success/30 p-3 rounded-lg">
+                  <p className="text-xs font-mono text-center text-success">
+                    ✓ Location verified: {location.lat.toFixed(4)}, {location.lng.toFixed(4)}
+                  </p>
+                  <p className="text-xs text-center text-muted-foreground mt-1">
+                    (Converted to H3 cell - exact address not stored)
                   </p>
                 </div>
               )}
