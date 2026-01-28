@@ -13,6 +13,7 @@ import { SubmitProposalDialog } from '@/components/SubmitProposalDialog'
 import { SubmitSignalDialog } from '@/components/SubmitSignalDialog'
 import { SignalAggregationMatrix } from '@/components/SignalAggregationMatrix'
 import { GlobeVisualization } from '@/components/GlobeVisualization'
+import { SatelliteMapView } from '@/components/SatelliteMapView'
 import { BlackBoxLog } from '@/components/BlackBoxLog'
 import { OnboardingFlow } from '@/components/OnboardingFlow'
 import { AccountDashboard } from '@/components/AccountDashboard'
@@ -23,7 +24,7 @@ import { promoteClusterToProblem } from '@/lib/signalLifecycle'
 import type { Bubble, Problem, Proposal, MetaAlert, BlackBoxEvent, Signal, SignalCluster } from '@/lib/types'
 import type { UserAccount } from '@/lib/auth'
 import { canSubmitSignals } from '@/lib/auth'
-import { Plus, Warning, User, Broadcast } from '@phosphor-icons/react'
+import { Plus, Warning, User, Broadcast, MapPin } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 
 function App() {
@@ -45,6 +46,7 @@ function App() {
   const [showWelcome, setShowWelcome] = useState(false)
   const [showAccountDashboard, setShowAccountDashboard] = useState(false)
   const [showGlobeView, setShowGlobeView] = useState(false)
+  const [showSatelliteMap, setShowSatelliteMap] = useState(false)
   const [currentLayer, setCurrentLayer] = useState<'L1' | 'L2' | 'L3' | 'L4'>('L1')
 
   useEffect(() => {
@@ -191,7 +193,21 @@ function App() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setShowGlobeView(!showGlobeView)}
+                onClick={() => {
+                  setShowSatelliteMap(!showSatelliteMap)
+                  setShowGlobeView(false)
+                }}
+              >
+                <MapPin size={16} className="mr-1.5" />
+                Satellite Map
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setShowGlobeView(!showGlobeView)
+                  setShowSatelliteMap(false)
+                }}
               >
                 <Broadcast size={16} className="mr-1.5" />
                 Globe View
@@ -239,6 +255,21 @@ function App() {
       <main className="container mx-auto px-6 py-8 max-w-7xl">
         {showSystemHealth ? (
           <SystemMonitoring onClose={() => setShowSystemHealth(false)} />
+        ) : showSatelliteMap ? (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <Button variant="outline" onClick={() => setShowSatelliteMap(false)}>
+                Back to Bubble View
+              </Button>
+            </div>
+            <SatelliteMapView
+              signals={safeSignals}
+              clusters={[]}
+              onSignalClick={(signal) => {
+                console.log('Selected signal:', signal)
+              }}
+            />
+          </div>
         ) : showGlobeView ? (
           <div className="space-y-6">
             <div className="flex items-center justify-between">
