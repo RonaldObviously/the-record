@@ -20,12 +20,13 @@ import { AccountDashboard } from '@/components/AccountDashboard'
 import { SystemExplanation } from '@/components/SystemExplanation'
 import { WelcomeDialog } from '@/components/WelcomeDialog'
 import { CryptoTransparencyExplainer } from '@/components/CryptoTransparencyExplainer'
+import { CostBreakdown } from '@/components/CostBreakdown'
 import { initializeSystem } from '@/lib/seedData'
 import { promoteClusterToProblem } from '@/lib/signalLifecycle'
 import type { Bubble, Problem, Proposal, MetaAlert, BlackBoxEvent, Signal, SignalCluster } from '@/lib/types'
 import type { UserAccount } from '@/lib/auth'
 import { canSubmitSignals } from '@/lib/auth'
-import { Plus, Warning, User, Broadcast, MapPin, HardDrive } from '@phosphor-icons/react'
+import { Plus, Warning, User, Broadcast, MapPin, HardDrive, CurrencyDollar } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 import { IPFSStoragePanel } from '@/components/IPFSStoragePanel'
 import { useIPFSStorage } from '@/hooks/use-ipfs-storage'
@@ -53,6 +54,7 @@ function App() {
   const [currentLayer, setCurrentLayer] = useState<'L1' | 'L2' | 'L3' | 'L4'>('L1')
   const [selectedH3Cell, setSelectedH3Cell] = useState<string | null>(null)
   const [showIPFSPanel, setShowIPFSPanel] = useState(false)
+  const [showCostBreakdown, setShowCostBreakdown] = useState(false)
 
   const ipfs = useIPFSStorage()
 
@@ -254,6 +256,14 @@ function App() {
               <SystemExplanation />
               <CryptoTransparencyExplainer />
               <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowCostBreakdown(true)}
+              >
+                <CurrencyDollar size={16} className="mr-1.5" />
+                Cost Breakdown
+              </Button>
+              <Button
                 variant={ipfs.state.initialized ? "default" : "outline"}
                 size="sm"
                 onClick={() => setShowIPFSPanel(true)}
@@ -334,7 +344,14 @@ function App() {
       )}
 
       <main className="container mx-auto px-6 py-8 max-w-7xl">
-        {showSystemHealth ? (
+        {showCostBreakdown ? (
+          <div className="space-y-6">
+            <Button variant="outline" onClick={() => setShowCostBreakdown(false)}>
+              ← Back to Main View
+            </Button>
+            <CostBreakdown />
+          </div>
+        ) : showSystemHealth ? (
           <SystemMonitoring onClose={() => setShowSystemHealth(false)} />
         ) : showSatelliteMap ? (
           <div className="space-y-6">
