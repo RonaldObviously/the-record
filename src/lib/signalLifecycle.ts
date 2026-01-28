@@ -35,6 +35,7 @@ export function clusterSignals(signals: Signal[]): ClusteringResult {
         weight: nearbySignals.reduce((sum, s) => sum + s.attestations + 1, 0),
         status: nearbySignals.length >= CLUSTER_THRESHOLD * 2 ? 'mature' : 'forming',
         createdAt: new Date(),
+        level: 1,
       }
       
       clusters.push(cluster)
@@ -128,4 +129,69 @@ export function shouldPromoteCluster(cluster: SignalCluster): boolean {
   const hasHighWeight = cluster.weight >= 50
   
   return gravity >= 100 || (hasEnoughSignals && hasHighWeight)
+}
+
+export function clusterClusters(clusters: SignalCluster[], level: 2 | 3 | 4): SignalCluster[] {
+  const parentClusters: SignalCluster[] = []
+  const processed = new Set<string>()
+
+  const thresholds = {
+    2: { minChildren: 3, minWeight: 50 },
+    3: { minChildren: 5, minWeight: 200 },
+    4: { minChildren: 3, minWeight: 1000 },
+  }
+
+  const threshold = thresholds[level]
+
+  for (const cluster of clusters) {
+    if (processed.has(cluster.id)) continue
+    if (cluster.level !== level - 1) continue
+
+    const relatedClusters = clusters.filter(c => 
+      !processed.has(c.id) &&
+      c.level === level - 1 &&
+      c.category === cluster.category &&
+      areNeighboringClusters(cluster, c)
+    )
+
+    if (relatedClusters.length >= threshold.minChildren) {
+      const totalWeight = relatedClusters.reduce((sum, c) => sum + c.weight, 0)
+      
+      if (totalWeight >= threshold.minWeight) {
+        const parentCluster: SignalCluster = {
+          id: `L${level}-cluster-${Date.now()}`,
+          h3Cell: cluster.h3Cell,
+          signals: relatedClusters.flatMap(c => c.signals),
+          semanticSummary: generateClusterSummary(relatedClusters),
+          category: cluster.category,
+          weight: totalWeight,
+          status: 'priority',
+          createdAt: new Date(),
+          level,
+          childClusterIds: relatedClusters.map(c => c.id),
+        }
+        
+        parentClusters.push(parentCluster)
+        relatedClusters.forEach(c => processed.add(c.id))
+      }
+    }
+  }
+
+  return parentClusters
+}
+
+function areNeighboringClusters(cluster1: SignalCluster, cluster2: SignalCluster): boolean {
+  const neighbors = getNeighborCells(cluster1.h3Cell)
+  return neighbors.includes(cluster2.h3Cell) || cluster1.h3Cell === cluster2.h3Cell
+}
+
+function generateClusterSummary(clusters: SignalCluster[]): string {
+  const summaries = clusters.map(c => c.semanticSummary)
+  const commonTerms = findCommonTerms(summaries)
+  
+  if (commonTerms.length > 0) {
+    return `Regional pattern: ${commonTerms.join(', ')} affecting ${clusters.length} areas`
+  }
+  
+  return `${clusters[0]?.category || 'Issue'} affecting ${clusters.length} neighboring areas`
 }

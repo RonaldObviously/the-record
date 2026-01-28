@@ -36,6 +36,9 @@ export interface SignalCluster {
   weight: number
   status: 'forming' | 'mature' | 'priority'
   createdAt: Date
+  level: 1 | 2 | 3 | 4
+  parentClusterId?: string
+  childClusterIds?: string[]
 }
 
 export interface Problem {

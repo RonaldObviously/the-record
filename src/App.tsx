@@ -34,6 +34,8 @@ import { Plus, Warning, User, Broadcast, MapPin, HardDrive, CurrencyDollar } fro
 import { toast } from 'sonner'
 import { IPFSStoragePanel } from '@/components/IPFSStoragePanel'
 import { useIPFSStorage } from '@/hooks/use-ipfs-storage'
+import { ClusteringExplainer } from '@/components/ClusteringExplainer'
+import { ResearchSystemExplainer } from '@/components/ResearchSystemExplainer'
 
 function App() {
   const [initialized, setInitialized] = useKV<boolean>('system-initialized', false)
@@ -259,6 +261,8 @@ function App() {
             <div className="flex items-center gap-3">
               <SystemExplanation />
               <SignalLifecycleExplainer />
+              <ClusteringExplainer />
+              <ResearchSystemExplainer />
               <AccountabilityExplainer />
               <CryptoTransparencyExplainer />
               <DataIntegrityExplainer />
