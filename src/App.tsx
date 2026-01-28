@@ -19,6 +19,7 @@ import { OnboardingFlow } from '@/components/OnboardingFlow'
 import { AccountDashboard } from '@/components/AccountDashboard'
 import { SystemExplanation } from '@/components/SystemExplanation'
 import { WelcomeDialog } from '@/components/WelcomeDialog'
+import { CryptoTransparencyExplainer } from '@/components/CryptoTransparencyExplainer'
 import { initializeSystem } from '@/lib/seedData'
 import { promoteClusterToProblem } from '@/lib/signalLifecycle'
 import type { Bubble, Problem, Proposal, MetaAlert, BlackBoxEvent, Signal, SignalCluster } from '@/lib/types'
@@ -196,6 +197,7 @@ function App() {
             </div>
             <div className="flex items-center gap-3">
               <SystemExplanation />
+              <CryptoTransparencyExplainer />
               {userAccount && (
                 <Button
                   variant="outline"
