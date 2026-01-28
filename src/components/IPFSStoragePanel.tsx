@@ -26,6 +26,11 @@ import {
   CheckCircle,
   XCircle,
   Info,
+  Lock,
+  Globe,
+  Users,
+  Shield,
+  Eye,
 } from '@phosphor-icons/react'
 import { useIPFSStorage } from '@/hooks/use-ipfs-storage'
 import { toast } from 'sonner'
@@ -113,6 +118,73 @@ export function IPFSStoragePanel({
                     IPFS (InterPlanetary File System) ensures your data cannot be censored,
                     deleted, or controlled by any single party. Content is addressed by its hash,
                     making it tamper-proof and verifiable.
+                  </p>
+                </div>
+              </div>
+            </Card>
+
+            <Card className="p-4">
+              <div className="space-y-4">
+                <h3 className="font-semibold">7-Layer Redundancy Protection</h3>
+                <p className="text-xs text-muted-foreground">
+                  Your data is protected by multiple independent layers. Up to 6 can fail and the truth still survives.
+                </p>
+                <div className="space-y-2">
+                  <LayerStatus
+                    number={1}
+                    title="Hash Chain"
+                    icon={<Lock size={16} />}
+                    status="active"
+                    description="Immutable cryptographic ledger"
+                  />
+                  <LayerStatus
+                    number={2}
+                    title="IPFS Network"
+                    icon={<Globe size={16} />}
+                    status={ipfs.state.initialized ? 'active' : 'inactive'}
+                    description="Content-addressed peer storage"
+                  />
+                  <LayerStatus
+                    number={3}
+                    title="Filecoin"
+                    icon={<Database size={16} />}
+                    status="design"
+                    description="Economic incentive layer (~$0.10/GB/year)"
+                  />
+                  <LayerStatus
+                    number={4}
+                    title="Arweave"
+                    icon={<Database size={16} />}
+                    status="design"
+                    description="Permanent storage (~$5/GB one-time)"
+                  />
+                  <LayerStatus
+                    number={5}
+                    title="User Nodes"
+                    icon={<Users size={16} />}
+                    status={ipfs.state.pinnedCount > 0 ? 'active' : 'inactive'}
+                    description={`You've pinned ${ipfs.state.pinnedCount} items`}
+                  />
+                  <LayerStatus
+                    number={6}
+                    title="Validators"
+                    icon={<Shield size={16} />}
+                    status="active"
+                    description="Byzantine fault tolerant consensus"
+                  />
+                  <LayerStatus
+                    number={7}
+                    title="Meta-Layer"
+                    icon={<Eye size={16} />}
+                    status="active"
+                    description="Independent oversight monitoring"
+                  />
+                </div>
+                <div className="bg-success/10 p-3 rounded-lg border border-success">
+                  <p className="text-xs font-medium text-success">
+                    {ipfs.state.initialized 
+                      ? `✓ Data protected by ${2 + (ipfs.state.pinnedCount > 0 ? 1 : 0)} active layers + 2 operational layers`
+                      : '2 layers active. Initialize IPFS for 3-layer protection.'}
                   </p>
                 </div>
               </div>
@@ -317,5 +389,53 @@ export function IPFSStoragePanel({
         </ScrollArea>
       </DialogContent>
     </Dialog>
+  )
+}
+
+interface LayerStatusProps {
+  number: number
+  title: string
+  icon: React.ReactNode
+  status: 'active' | 'inactive' | 'design'
+  description: string
+}
+
+function LayerStatus({ number, title, icon, status, description }: LayerStatusProps) {
+  const statusConfig = {
+    active: {
+      color: 'text-success',
+      bg: 'bg-success/10',
+      border: 'border-success/50',
+      label: 'Active'
+    },
+    inactive: {
+      color: 'text-muted-foreground',
+      bg: 'bg-muted/50',
+      border: 'border-border',
+      label: 'Inactive'
+    },
+    design: {
+      color: 'text-accent',
+      bg: 'bg-accent/10',
+      border: 'border-accent/50',
+      label: 'Design'
+    }
+  }
+
+  const config = statusConfig[status]
+
+  return (
+    <div className={`flex items-center gap-3 p-3 rounded-lg border ${config.border} ${config.bg}`}>
+      <div className={`${config.color}`}>{icon}</div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2">
+          <p className="text-xs font-semibold">L{number}: {title}</p>
+          <Badge variant="outline" className={`text-[10px] ${config.color} border-current`}>
+            {config.label}
+          </Badge>
+        </div>
+        <p className="text-[10px] text-muted-foreground truncate">{description}</p>
+      </div>
+    </div>
   )
 }
