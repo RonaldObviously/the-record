@@ -1,144 +1,169 @@
-# Planning Guide
+# The Record - Transparent Collective Decision System
 
-A personal time-blocking and focus management tool that helps knowledge workers protect deep work time, visualize energy patterns, and maintain work-life boundaries through intelligent scheduling and distraction blocking.
+A browser-based demonstration of a 4-layer anti-group-failure architecture for transparent, uncensorable, and accountable collective decision-making.
 
 **Experience Qualities**: 
-1. **Calm Focus** - Interface should reduce anxiety and promote concentration; minimal distractions, clear current task
-2. **Respectful Intelligence** - Smart suggestions without nagging; respects user autonomy while offering insights
-3. **Honest Reflection** - Shows actual time usage patterns without judgment; builds self-awareness through data
+1. **Clinical Precision** - Interface designed for information density and clarity; technical without being intimidating
+2. **Radical Transparency** - Every decision, validation, and outcome is visible and traceable; no hidden processes
+3. **Institutional Trust** - Professional, serious design that conveys stability and reliability for governance use
 
-**Complexity Level**: Light Application (multiple features with basic state)
-This is a focused productivity tool with time blocking, task management, and analytics. It requires session tracking, calendar visualization, and statistical insights but remains single-purpose and straightforward.
+**Complexity Level**: Complex Application (advanced functionality, likely with multiple views)
+This is a multi-layered governance system with hierarchical navigation, cryptographic verification, distributed validation, prediction tracking, and meta-layer monitoring. Requires sophisticated state management, real-time data visualization, and multiple interconnected views.
 
 ## Essential Features
 
-**Time Block Creation**
-- Functionality: Create focused work blocks with duration, task, and energy level
-- Purpose: Protect deep work time and set clear intentions
-- Trigger: User clicks "New Block" or quick-add shortcut
-- Progression: Select duration → Name task → Choose energy level (high/medium/low) → Optional: add notes → Start or schedule
-- Success criteria: Block creation takes <10 seconds; blocks persist between sessions; active blocks show countdown
+**Hierarchical Bubble Navigation**
+- Functionality: Navigate through geographic and thematic governance contexts
+- Purpose: Allow users to drill down from global to local contexts, or explore thematic areas
+- Trigger: User clicks on a bubble/context card
+- Progression: Start at Global → Select continent/theme → Select nation → Select state → Select city → Select district
+- Success criteria: Navigation is intuitive; breadcrumb trail shows current location; can easily go back up the hierarchy
 
-**Focus Timer with Distraction Logging**
-- Functionality: Active countdown timer that logs interruptions when paused
-- Purpose: Build awareness of interruption patterns and improve focus duration
-- Trigger: User starts a time block
-- Progression: Timer counts down → User works → If interrupted, click pause and log reason → Resume or end → Review interruption patterns
-- Success criteria: Timer visible at all times; pause is one click; interruption logging is optional but encouraged
+**L1 - Anonymous Problem Reporting**
+- Functionality: Submit problems anonymously with category and priority
+- Purpose: Protect against social pressure and groupthink by allowing private consensus signals
+- Trigger: User clicks "Report Problem" in any bubble context
+- Progression: Select category → Describe problem → Set priority → Submit anonymously → Problem appears in L1 view
+- Success criteria: No identity stored; submission takes <30 seconds; problems aggregate by pattern
 
-**Weekly Energy Map**
-- Functionality: Visual heatmap showing when user is most productive based on completed blocks
-- Purpose: Help schedule deep work during peak energy times
-- Trigger: View analytics tab
-- Progression: Heatmap loads → Shows time-of-day vs day-of-week → Color intensity = completed focus time → Insights suggest best scheduling
-- Success criteria: Pattern emerges after 2 weeks of data; insights are actionable
+**L2 - Distributed Proposal Validation**
+- Functionality: Submit proposals with required predictions, see multi-validator validation results
+- Purpose: Prevent single-authority dominance through distributed constraint checking
+- Trigger: User clicks "Submit Proposal"
+- Progression: Link to problem (optional) → Write title/description → Add predictions (required) → Submit → Validators check budget/legal/feasibility/impact → Status updates to validated/rejected
+- Success criteria: Predictions are mandatory; validation results are transparent; multiple validator types required
 
-**Task Backlog Management**
-- Functionality: Simple list of tasks to pull into time blocks
-- Purpose: Separate task capture from scheduling; reduce mental overhead
-- Trigger: User adds task to backlog or imports from existing list
-- Progression: Add task → Optionally estimate time → Drag into time block when ready → Mark complete
-- Success criteria: Quick capture; easy scheduling; no complex dependencies
+**L3 - Prediction Tracking & Accountability**
+- Functionality: Track predicted vs actual outcomes, calculate accuracy scores
+- Purpose: Create accountability through skin-in-the-game predictions; influence based on accuracy
+- Trigger: Proposal reaches active/completed status
+- Progression: View predictions → Time passes → Actual outcomes recorded → Accuracy calculated → Influence adjusted
+- Success criteria: Clear display of prediction vs reality; accuracy scoring is transparent; historical track record visible
 
-**Daily Reflection Prompt**
-- Functionality: End-of-day review asking what worked and what didn't
-- Purpose: Build self-awareness and improve future planning
-- Trigger: Automatically appears at end of workday or manually triggered
-- Progression: System asks 2-3 simple questions → User responds briefly → Responses stored for pattern analysis
-- Success criteria: Takes <2 minutes; insights surface after consistent use
+**L4 - Meta-Layer System Monitoring**
+- Functionality: Independent oversight detecting system drift, bias, and capture attempts
+- Purpose: Self-correcting system that flags anomalies without ability to control lower layers
+- Trigger: Automated analysis or user clicks "System Health"
+- Progression: Monitor validator patterns → Detect cartels/bias → Generate alerts → Display red flags → Cannot modify lower layers
+- Success criteria: Alerts are timely; severity levels are clear; monitoring is independent
+
+**Black Box Event Log**
+- Functionality: Immutable hash-chained event ledger showing all system activity
+- Purpose: Provide cryptographic proof of data integrity and complete audit trail
+- Trigger: Automatic logging of all problems, proposals, validations, predictions
+- Progression: Event occurs → Hash calculated → Linked to previous hash → Added to chain → Displayed in log
+- Success criteria: Hash chain is verifiable; tampering is detectable; events are immutable
+
+**System Health Dashboard**
+- Functionality: Real-time monitoring of validator network, security analysis, cryptographic verification
+- Purpose: Provide transparency into system operation and health metrics
+- Trigger: User clicks "System Health"
+- Progression: View validator network → See geographic distribution → Check uptime/stake → Analyze security → Verify cryptography
+- Success criteria: All metrics update in real-time; easy to understand even if non-technical; trust-building
 
 ## Edge Case Handling
 
-- **Missed Blocks**: Show as incomplete with time estimate; no shame, just data
-- **Overlapping Blocks**: Warn on creation; allow override if intentional
-- **Block Overrun**: Timer goes negative to show actual time; don't auto-end
-- **No Data**: Empty states encourage first block creation with templates
-- **Long Breaks**: Detect inactivity; ask if block should be ended
-- **Timezone Changes**: Use local time; don't break historical data
+- **No Child Bubbles**: Show clear message that context is a leaf node
+- **Empty Problem/Proposal Lists**: Encourage first submission with clear CTAs
+- **Missing Predictions**: Block proposal submission until at least one prediction added
+- **Validator Downtime**: Show status clearly; BFT threshold ensures continued operation
+- **Hash Chain Verification Failure**: Display critical alert; system integrity compromised
+- **Cartel Detection**: Auto-flag and display severity; cannot block but increases transparency
+- **No Active Bubble Selected**: Hide submission buttons; show navigation prompt
 
 ## Design Direction
 
-The design should feel like a calm workspace - focused, uncluttered, and supportive. Think analog notebook meets smart stopwatch. Warm, human, trustworthy. Not gamified or patronizing. The interface should fade into the background during focus time, then provide thoughtful insights during reflection.
+The design should evoke institutional authority and technical precision. Think Bloomberg Terminal meets research dashboard - information-dense, serious, trustworthy. Dark theme with clinical color palette. No consumer app flourishes or unnecessary decoration. Every element serves a functional purpose. Typography should be highly readable with clear hierarchy for scanning dense information.
 
 ## Color Selection
 
-A warm, focused palette that promotes concentration without being clinical.
+A dark, technical palette that conveys seriousness and institutional trust.
 
-- **Primary Color**: Deep Indigo `oklch(0.35 0.10 265)` - Calm authority for active timers and primary actions
+- **Primary Color**: Deep Slate `oklch(0.45 0.12 240)` - Institutional authority for main actions and active states
 - **Secondary Colors**: 
-  - Warm Sand `oklch(0.92 0.02 75)` - Background warmth without harshness
-  - Charcoal `oklch(0.25 0.01 240)` - Primary text with slight warmth
-- **Accent Color**: Amber `oklch(0.70 0.15 70)` - Attention for interruptions and insights
+  - Dark Charcoal `oklch(0.15 0.01 240)` - Background that reduces eye strain
+  - Light Gray `oklch(0.95 0.01 240)` - Primary text with high contrast
+- **Accent Color**: Amber `oklch(0.65 0.15 70)` - Attention for warnings and meta-alerts
 - **Foreground/Background Pairings**:
-  - Primary (Deep Indigo): White text - Ratio 8.5:1 ✓
-  - Accent (Amber): Dark Charcoal text - Ratio 7.2:1 ✓
-  - Warm Sand background: Charcoal text - Ratio 13.1:1 ✓
+  - Background (Dark Charcoal): Light Gray text - Ratio 14.2:1 ✓
+  - Primary (Deep Slate): White text - Ratio 6.8:1 ✓
+  - Accent (Amber): Dark text - Ratio 8.1:1 ✓
+  - Card (Slightly Lighter): Light Gray text - Ratio 12.5:1 ✓
 
 Additional semantic colors:
-- **Focus Mode**: `oklch(0.45 0.12 265)` - Deep indigo for active work
-- **Success**: `oklch(0.60 0.12 150)` - Muted green for completed blocks
-- **Low Energy**: `oklch(0.55 0.08 220)` - Cool blue for low-energy blocks
-- **High Energy**: `oklch(0.50 0.15 30)` - Warm red-orange for peak blocks
+- **Success**: `oklch(0.55 0.15 165)` - Muted teal for validated proposals and passed checks
+- **Destructive**: `oklch(0.55 0.20 25)` - Red for rejected proposals and critical alerts
+- **Muted**: `oklch(0.22 0.01 240)` - Subdued backgrounds for secondary content
+- **Border**: `oklch(0.28 0.01 240)` - Subtle borders that don't compete with content
 
 ## Font Selection
 
-Clean, readable typography that doesn't draw attention to itself. Balanced between technical precision and human warmth.
+Technical typefaces that convey precision and clarity. IBM Plex Sans for excellent readability and professional character; JetBrains Mono for data/metrics.
 
-- **Primary Typeface**: Inter - Excellent readability at all sizes; neutral personality
-- **Timer/Data**: JetBrains Mono - For countdown display and time values
+- **Primary Typeface**: IBM Plex Sans - Clean, professional, excellent at all sizes
+- **Data/Metrics**: JetBrains Mono - Tabular nums, high clarity for technical data
 - **Typographic Hierarchy**:
-  - H1 (Page Title): Inter SemiBold / 28px / -0.02em letter spacing
-  - H2 (Section): Inter Medium / 20px / normal spacing
-  - Timer Display: JetBrains Mono Bold / 48px / tabular-nums
-  - Body: Inter Regular / 15px / 1.6 line height
-  - Small Labels: Inter Medium / 13px / 0.02em tracking
-  - Metadata: Inter Regular / 13px / muted color
+  - H1 (Main Title): IBM Plex Sans SemiBold / 24px / -0.01em letter spacing / Mono styling
+  - H2 (Section): IBM Plex Sans SemiBold / 18px / normal spacing
+  - H3 (Subsection): IBM Plex Sans SemiBold / 16px / normal spacing
+  - Body: IBM Plex Sans Regular / 14px / 1.5 line height
+  - Small: IBM Plex Sans Regular / 12px / 1.4 line height
+  - Data: JetBrains Mono Regular / 14px / tabular-nums / monospace
+  - Hash: JetBrains Mono Regular / 11px / monospace / muted color
 
 ## Animations
 
-Subtle and purposeful - reinforce focus state changes and celebrate completions. Timer pulses gently when active; completed blocks get a satisfying check animation; energy map builds in gradually. All transitions smooth (250-300ms ease-out). No unnecessary motion that could distract during focus time.
+Minimal, functional animations only. Transitions should be quick (150-200ms) to maintain professional feel. No playful or decorative motion. Button states change instantly. Tab switches fade smoothly. Dialog appears/disappears with subtle scale. Loading states use simple progress indicators, never spinners. Everything serves to clarify state changes, nothing exists for delight.
 
 ## Component Selection
 
 - **Components**:
-  - **Card**: Container for time blocks, daily summary, insights
-  - **Button**: Primary actions (Start, Pause, Complete)
-  - **Input**: Quick task entry, reflection prompts
-  - **Badge**: Energy level indicators, tags
-  - **Progress**: Visual completion within blocks
-  - **Tabs**: Switch between Today, Week, Analytics
-  - **Dialog**: Block creation, settings
-  - **Popover**: Quick-add menu, interruption logging
-  - **Calendar**: Week view with time blocks
-  - **Separator**: Between time periods
-  - **Tooltip**: Explain features without clutter
+  - **Card**: Primary container for all content sections - bubbles, problems, proposals, monitoring
+  - **Button**: All actions - submit, navigate, close; clear primary vs secondary states
+  - **Dialog**: Problem submission, proposal creation; modal for focused input
+  - **Tabs**: Layer navigation (L1/L2/L3/L4), system monitoring sections
+  - **Badge**: Status indicators, severity levels, bubble types, validator locations
+  - **Input/Textarea**: Form fields for submissions
+  - **Select**: Dropdowns for categories, priorities, problem linking
+  - **ScrollArea**: Black box log, long lists
+  - **Progress**: Validator uptime, Gini coefficient visualization
+  - **Separator**: Between sections within cards
 
 - **Customizations**:
-  - **Focus Timer**: Large countdown display with pause/stop controls
-  - **Energy Heatmap**: Custom D3 visualization showing productive hours
-  - **Time Block Card**: Shows task, timer, and quick actions
-  - **Interruption Logger**: Quick modal to capture what broke focus
+  - **Bubble Card**: Clickable cards showing bubble name, type, description, population, problem/proposal counts
+  - **Problem Card**: Shows category badge, description, priority, timestamp
+  - **Proposal Card**: Title, description, status, validations (checkmarks), predictions (timeline)
+  - **Meta Alert**: Severity icon + color, message, affected bubbles, timestamp
+  - **Black Box Event**: Monospace hash display, event type icon, timestamp
+  - **Validator Card**: Name, location, uptime %, stake amount, progress bar
+  - **Hash Chain Block**: Block number, hash, previous hash, event count
 
 - **States**:
-  - Blocks: Scheduled (outline), Active (filled primary), Paused (amber border), Complete (muted with check)
-  - Timer: Running (pulsing primary), Paused (amber), Complete (success green)
-  - Tasks: Backlog (neutral), Scheduled (primary), Complete (muted strikethrough)
+  - Bubbles: Default (border), Hover (primary border), Selected (primary background in breadcrumb)
+  - Proposals: Pending (gray), Validated (green), Rejected (red), Active (blue), Completed (purple)
+  - Validations: Passed (green check), Failed (red X)
+  - Alerts: Low (blue), Medium (yellow), High (orange), Critical (red)
+  - Validators: Active (green indicator), Offline (gray), Suspicious (yellow flag)
 
 - **Icon Selection**:
-  - Timer: `Clock`, `Play`, `Pause`, `Stop`
-  - Energy: `Lightning`, `BatteryHigh`, `BatteryMedium`, `BatteryLow`
-  - Tasks: `ListBullets`, `Plus`, `Check`, `X`
-  - Analytics: `ChartBar`, `CalendarBlank`, `TrendUp`
-  - Interruptions: `Bell`, `ChatCircle`, `EnvelopeSimple`
+  - Navigation: Standard UI icons from Phosphor
+  - Warnings: `Warning`, `WarningCircle`, `Info`
+  - Actions: `Plus`, `X`, `Check`, `Clock`
+  - Status: `CheckCircle`, `XCircle`
+  - No decorative icons - function only
 
 - **Spacing**:
-  - Cards: `p-6` for time blocks, `p-4` for task items
-  - Layout: `gap-6` for main sections, `gap-4` for lists
-  - Inline: `gap-2` for icon+text, `gap-3` for button groups
+  - Page margins: `px-6 py-8` (max-w-7xl container)
+  - Card padding: `p-6` for main cards, `p-4` for nested/smaller cards
+  - Section gaps: `gap-6` for main layout, `gap-4` for lists
+  - Element gaps: `gap-3` within cards, `gap-2` for badges/inline
+  - List spacing: `space-y-3` for cards, `space-y-2` for small items
 
 - **Mobile**:
-  - Timer takes center stage full-width
-  - Week view scrolls horizontally
-  - Bottom nav for quick actions
-  - Swipe to complete blocks
-  - Simplified heatmap with tap for details
+  - Single column layout (grid-cols-1 on mobile, grid-cols-3 on lg)
+  - System Health becomes full-screen overlay
+  - Bubble cards stack vertically
+  - Black Box log moves below main content
+  - Tabs remain horizontal with scroll if needed
+  - Dialogs become full-screen on small devices
+  - Touch-friendly targets (min 44px)
