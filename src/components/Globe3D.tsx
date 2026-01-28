@@ -83,109 +83,110 @@ const createEarthTexture = (): THREE.Texture => {
   canvas.height = 2048
   const ctx = canvas.getContext('2d')!
 
+  const deepOcean = '#0a1e3d'
+  const shallowOcean = '#1a4d7a'
+  const landBase = '#2d5a3a'
+  const landHigh = '#4a7a5a'
+  const mountain = '#8a9a7a'
+  const desert = '#c4a56a'
+  const ice = '#e8f4f8'
+
   const oceanGradient = ctx.createLinearGradient(0, 0, 0, canvas.height)
-  oceanGradient.addColorStop(0, '#1a3a52')
-  oceanGradient.addColorStop(0.25, '#1e5f74')
-  oceanGradient.addColorStop(0.5, '#156a89')
-  oceanGradient.addColorStop(0.75, '#1e5f74')
-  oceanGradient.addColorStop(1, '#1a3a52')
+  oceanGradient.addColorStop(0, deepOcean)
+  oceanGradient.addColorStop(0.5, shallowOcean)
+  oceanGradient.addColorStop(1, deepOcean)
   ctx.fillStyle = oceanGradient
   ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.03)'
-  for (let i = 0; i < 800; i++) {
-    const x = Math.random() * canvas.width
-    const y = Math.random() * canvas.height
-    const size = Math.random() * 2 + 1
-    ctx.fillRect(x, y, size, size)
-  }
-
-  const continents = [
-    { x: 0.15, y: 0.35, w: 0.25, h: 0.35 },
-    { x: 0.45, y: 0.20, w: 0.35, h: 0.45 },
-    { x: 0.55, y: 0.60, w: 0.18, h: 0.25 },
-    { x: 0.65, y: 0.25, w: 0.28, h: 0.40 },
-    { x: 0.82, y: 0.50, w: 0.15, h: 0.20 },
-    { x: 0.10, y: 0.25, w: 0.12, h: 0.18 },
-  ]
-
-  continents.forEach(continent => {
-    const gradient = ctx.createRadialGradient(
-      canvas.width * continent.x + canvas.width * continent.w / 2,
-      canvas.height * continent.y + canvas.height * continent.h / 2,
-      0,
-      canvas.width * continent.x + canvas.width * continent.w / 2,
-      canvas.height * continent.y + canvas.height * continent.h / 2,
-      canvas.width * continent.w * 0.6
-    )
-    gradient.addColorStop(0, '#2d5a3d')
-    gradient.addColorStop(0.5, '#3d6b4d')
-    gradient.addColorStop(0.8, '#2a4a35')
-    gradient.addColorStop(1, '#1a3a25')
-    
-    ctx.fillStyle = gradient
+  const drawContinent = (coords: number[][], color: string) => {
+    ctx.fillStyle = color
     ctx.beginPath()
-    
-    const points = 40
-    for (let i = 0; i < points; i++) {
-      const angle = (i / points) * Math.PI * 2
-      const variance = 0.7 + Math.random() * 0.6
-      const rx = canvas.width * continent.w * 0.5 * variance
-      const ry = canvas.height * continent.h * 0.5 * variance
-      const px = canvas.width * continent.x + canvas.width * continent.w / 2 + Math.cos(angle) * rx
-      const py = canvas.height * continent.y + canvas.height * continent.h / 2 + Math.sin(angle) * ry
-      
-      if (i === 0) ctx.moveTo(px, py)
-      else ctx.lineTo(px, py)
-    }
+    coords.forEach((point, i) => {
+      const x = (point[0] + 180) * (canvas.width / 360)
+      const y = (90 - point[1]) * (canvas.height / 180)
+      if (i === 0) ctx.moveTo(x, y)
+      else ctx.lineTo(x, y)
+    })
     ctx.closePath()
     ctx.fill()
+  }
 
-    for (let i = 0; i < 35; i++) {
-      const px = canvas.width * continent.x + Math.random() * canvas.width * continent.w
-      const py = canvas.height * continent.y + Math.random() * canvas.height * continent.h
-      const size = Math.random() * 40 + 20
-      
-      ctx.fillStyle = Math.random() > 0.5 ? '#4a7a5d' : '#2a4a3d'
-      ctx.beginPath()
-      for (let j = 0; j < 8; j++) {
-        const a = (j / 8) * Math.PI * 2 + Math.random() * 0.5
-        const r = size * (0.4 + Math.random() * 0.6)
-        const x = px + Math.cos(a) * r
-        const y = py + Math.sin(a) * r
-        if (j === 0) ctx.moveTo(x, y)
-        else ctx.lineTo(x, y)
-      }
-      ctx.closePath()
-      ctx.fill()
-    }
+  const northAmerica = [
+    [-170, 70], [-130, 72], [-100, 70], [-80, 65], [-70, 50], [-75, 40], [-80, 30],
+    [-95, 25], [-105, 28], [-115, 32], [-125, 45], [-130, 50], [-140, 58], [-160, 65], [-170, 70]
+  ]
+  
+  const southAmerica = [
+    [-80, 12], [-75, 5], [-70, -5], [-68, -20], [-70, -35], [-72, -50], [-68, -55],
+    [-60, -52], [-55, -35], [-50, -15], [-52, -5], [-58, 0], [-65, 8], [-75, 10], [-80, 12]
+  ]
 
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)'
-    ctx.lineWidth = 2
-    for (let i = 0; i < 15; i++) {
-      const startX = canvas.width * continent.x + Math.random() * canvas.width * continent.w * 0.3
-      const startY = canvas.height * continent.y + Math.random() * canvas.height * continent.h
-      
-      ctx.beginPath()
-      ctx.moveTo(startX, startY)
-      
-      let x = startX
-      let y = startY
-      for (let j = 0; j < 5; j++) {
-        x += (Math.random() - 0.5) * 60
-        y += (Math.random() - 0.5) * 40
-        ctx.lineTo(x, y)
-      }
-      ctx.stroke()
-    }
+  const europe = [
+    [-10, 60], [0, 62], [10, 58], [20, 54], [25, 50], [30, 48], [25, 45],
+    [15, 43], [5, 45], [-5, 50], [-10, 55], [-10, 60]
+  ]
+
+  const africa = [
+    [-18, 35], [-10, 30], [10, 25], [25, 20], [35, 15], [42, 5], [50, -5],
+    [45, -15], [35, -25], [25, -30], [20, -34], [15, -30], [10, -20], [5, -10],
+    [0, 5], [-5, 15], [-10, 25], [-15, 32], [-18, 35]
+  ]
+
+  const asia = [
+    [30, 75], [60, 70], [90, 72], [120, 68], [140, 60], [145, 50], [140, 40],
+    [130, 35], [120, 25], [110, 20], [100, 22], [90, 25], [80, 28], [70, 32],
+    [60, 40], [50, 50], [40, 60], [35, 70], [30, 75]
+  ]
+
+  const australia = [
+    [115, -10], [130, -12], [145, -15], [150, -25], [148, -38], [140, -40],
+    [130, -35], [120, -30], [112, -20], [113, -13], [115, -10]
+  ]
+
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.3)'
+  ctx.shadowBlur = 8
+
+  drawContinent(northAmerica, landBase)
+  drawContinent(southAmerica, landHigh)
+  drawContinent(europe, landHigh)
+  drawContinent(africa, landBase)
+  drawContinent(asia, landBase)
+  drawContinent(australia, desert)
+
+  ctx.shadowBlur = 0
+
+  const greenland = [[[-45, 80], [-40, 75], [-50, 70], [-55, 75], [-45, 80]]]
+  greenland.forEach(land => drawContinent(land, ice))
+
+  const antarctica = [
+    [-180, -65], [-120, -70], [-60, -72], [0, -75], [60, -72], [120, -70], [180, -65],
+    [180, -90], [-180, -90], [-180, -65]
+  ]
+  drawContinent(antarctica, ice)
+
+  const mountainRanges = [
+    { lat: 40, lng: -120, size: 30 },
+    { lat: 28, lng: 85, size: 40 },
+    { lat: -15, lng: -70, size: 35 },
+    { lat: 48, lng: 10, size: 20 },
+  ]
+
+  mountainRanges.forEach(range => {
+    const x = ((range.lng + 180) / 360) * canvas.width
+    const y = ((90 - range.lat) / 180) * canvas.height
+    const gradient = ctx.createRadialGradient(x, y, 0, x, y, range.size)
+    gradient.addColorStop(0, mountain)
+    gradient.addColorStop(0.7, landHigh)
+    gradient.addColorStop(1, landBase)
+    ctx.fillStyle = gradient
+    ctx.fillRect(x - range.size, y - range.size, range.size * 2, range.size * 2)
   })
 
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.15)'
-  for (let i = 0; i < 3000; i++) {
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.04)'
+  for (let i = 0; i < 2000; i++) {
     const x = Math.random() * canvas.width
     const y = Math.random() * canvas.height
-    const size = Math.random() * 1.5
-    ctx.fillRect(x, y, size, size)
+    ctx.fillRect(x, y, 1, 1)
   }
 
   const texture = new THREE.CanvasTexture(canvas)
