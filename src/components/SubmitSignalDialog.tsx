@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import {
   Dialog,
   DialogContent,
@@ -74,6 +75,21 @@ export function SubmitSignalDialog({
       setBlurredArea('~500m radius')
     }
   }, [preselectedH3Cell])
+
+  useEffect(() => {
+    if (open) {
+      setCategory('infrastructure')
+      setDescription('')
+      if (!preselectedH3Cell) {
+        setUseLocation(false)
+        setLocation(null)
+        setH3Cell('')
+        setBlurredArea('')
+      }
+      setLocationProof(null)
+      setVerifying(false)
+    }
+  }, [open, preselectedH3Cell])
 
   const handleGetLocation = async () => {
     if (!navigator.geolocation) {
@@ -170,7 +186,7 @@ export function SubmitSignalDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             Submit Signal
@@ -182,15 +198,16 @@ export function SubmitSignalDialog({
           </DialogDescription>
         </DialogHeader>
         
-        <div className="bg-accent/10 border border-accent/30 p-3 rounded-lg mb-4">
-          <p className="text-xs text-muted-foreground leading-relaxed">
-            <strong className="text-foreground">Why anonymous?</strong> Private input prevents
-            groupthink, social pressure, and retaliation. Your signal will be clustered with others
-            to form collective truth without revealing individual identities.
-          </p>
-        </div>
+        <ScrollArea className="flex-1 pr-4">
+          <div className="bg-accent/10 border border-accent/30 p-3 rounded-lg mb-4">
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              <strong className="text-foreground">Why anonymous?</strong> Private input prevents
+              groupthink, social pressure, and retaliation. Your signal will be clustered with others
+              to form collective truth without revealing individual identities.
+            </p>
+          </div>
 
-        <div className="space-y-4 py-4">
+          <div className="space-y-4 py-4">
           <div className="space-y-2">
             <Label htmlFor="category">Category</Label>
             <Select value={category} onValueChange={(v) => setCategory(v as ProblemCategory)}>
@@ -365,8 +382,9 @@ export function SubmitSignalDialog({
             </p>
           </div>
         </div>
+        </ScrollArea>
 
-        <DialogFooter>
+        <DialogFooter className="flex-shrink-0">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
