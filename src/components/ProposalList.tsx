@@ -16,7 +16,10 @@ const statusColors: Record<Proposal['status'], string> = {
   validated: 'bg-green-500/10 text-green-700',
   rejected: 'bg-red-500/10 text-red-700',
   active: 'bg-blue-500/10 text-blue-700',
-  completed: 'bg-purple-500/10 text-purple-700'
+  'in-progress': 'bg-cyan-500/10 text-cyan-700',
+  completed: 'bg-purple-500/10 text-purple-700',
+  failed: 'bg-orange-500/10 text-orange-700',
+  unsafe: 'bg-destructive/10 text-destructive'
 }
 
 export function ProposalList({ proposals, showValidations, showPredictions }: ProposalListProps) {

@@ -62,7 +62,9 @@ export function SubmitProposalDialog({ open, onOpenChange, bubbleId, problems, o
       submittedBy: 'anonymous',
       status: 'pending',
       influenceBonded: 100,
-      realitySettled: false
+      realitySettled: false,
+      workQualityInspections: [],
+      incidentReports: []
     }
 
     onSubmit(proposal)

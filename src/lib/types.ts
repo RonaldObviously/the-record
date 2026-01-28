@@ -75,9 +75,11 @@ export interface Proposal {
   validations: Validation[]
   submittedAt: Date
   submittedBy: string
-  status: 'pending' | 'validated' | 'rejected' | 'active' | 'completed'
+  status: 'pending' | 'validated' | 'rejected' | 'active' | 'in-progress' | 'completed' | 'failed' | 'unsafe'
   influenceBonded: number
   realitySettled: boolean
+  workQualityInspections: WorkQualityInspection[]
+  incidentReports: IncidentReport[]
 }
 
 export interface Prediction {
@@ -124,6 +126,87 @@ export type ValidationType =
   | 'environmental'
   | 'semantic'
   | 'technical'
+
+export interface WorkQualityInspection {
+  id: string
+  proposalId: string
+  inspectorId: string
+  inspectorType: 'peer' | 'professional' | 'independent' | 'automated'
+  timestamp: Date
+  passed: boolean
+  criticalFailures: QualityFailure[]
+  minorIssues: QualityIssue[]
+  photographicEvidence: string[]
+  verbalTranscript?: string
+  inspectionDepth: 'visual' | 'structural' | 'comprehensive'
+  requiredFollowUp: boolean
+  influenceImpact: number
+}
+
+export interface QualityFailure {
+  id: string
+  severity: 'critical' | 'severe' | 'moderate'
+  category: 'safety' | 'structural' | 'code-violation' | 'incomplete' | 'substandard'
+  description: string
+  location?: string
+  evidenceHash: string
+  requiresImmediateAction: boolean
+}
+
+export interface QualityIssue {
+  id: string
+  category: 'aesthetic' | 'minor-deviation' | 'documentation' | 'efficiency'
+  description: string
+  recommendedAction: string
+}
+
+export interface IncidentReport {
+  id: string
+  proposalId: string
+  reportedBy: string
+  timestamp: Date
+  incidentType: 'accident' | 'failure' | 'safety-hazard' | 'fraud' | 'negligence'
+  severity: 'minor' | 'moderate' | 'serious' | 'catastrophic'
+  description: string
+  injuries?: InjuryReport[]
+  propertyDamage?: PropertyDamageReport
+  rootCause?: RootCauseAnalysis
+  preventable: boolean
+  investigationStatus: 'reported' | 'investigating' | 'concluded'
+  investigationFindings?: string
+  responsibleParties: ResponsibilityAssignment[]
+  influencePenalties: Map<string, number>
+  legalConsequences?: string
+}
+
+export interface InjuryReport {
+  severity: 'minor' | 'moderate' | 'severe' | 'fatal'
+  description: string
+  medicalTreatment: boolean
+  reportedToAuthorities: boolean
+}
+
+export interface PropertyDamageReport {
+  estimatedCost: number
+  description: string
+  affectedParties: string[]
+}
+
+export interface RootCauseAnalysis {
+  primaryCause: 'design-flaw' | 'material-failure' | 'human-error' | 'negligence' | 'deliberate-fraud' | 'insufficient-inspection'
+  contributingFactors: string[]
+  preventionRecommendations: string[]
+  systemicIssue: boolean
+}
+
+export interface ResponsibilityAssignment {
+  userId: string
+  role: 'proposer' | 'executor' | 'inspector' | 'validator'
+  responsibilityPercentage: number
+  influencePenalty: number
+  banDuration?: number
+  requiresRetraining: boolean
+}
 
 export interface Validator {
   id: string

@@ -192,7 +192,9 @@ export function initializeSystem() {
       submittedBy: 'anon-user-1',
       status: 'validated',
       influenceBonded: 500,
-      realitySettled: false
+      realitySettled: false,
+      workQualityInspections: [],
+      incidentReports: []
     }
   ]
 
