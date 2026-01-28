@@ -39,7 +39,7 @@ export function WelcomeDialog({ open, onGetStarted }: WelcomeDialogProps) {
         </DialogHeader>
 
         <ScrollArea className="flex-1 pr-4">
-          <div className="space-y-6 py-4">
+          <div className="space-y-6 pb-4">
           <div className="bg-accent/10 border border-accent/30 p-4 rounded-lg">
             <p className="text-sm leading-relaxed">
               THE RECORD is <strong>not a government, voting system, or social network</strong>.
@@ -176,16 +176,16 @@ export function WelcomeDialog({ open, onGetStarted }: WelcomeDialogProps) {
               </p>
             </div>
           </div>
-
-            <div className="flex justify-end gap-3 pt-4 border-t">
-              <Button onClick={onGetStarted} size="lg" className="w-full md:w-auto">
-                <ShieldCheck size={18} className="mr-2" />
-                Create My Account
-                <ArrowRight size={18} className="ml-2" />
-              </Button>
-            </div>
           </div>
         </ScrollArea>
+
+        <div className="flex justify-end gap-3 pt-4 border-t">
+          <Button onClick={onGetStarted} size="lg" className="w-full md:w-auto">
+            <ShieldCheck size={18} className="mr-2" />
+            Create My Account
+            <ArrowRight size={18} className="ml-2" />
+          </Button>
+        </div>
       </DialogContent>
     </Dialog>
   )
