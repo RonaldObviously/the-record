@@ -35,39 +35,114 @@ export function CostBreakdown() {
         </p>
       </div>
 
-      <ServerScalingVisualization />
-
-      <AutoScalingVisualization />
-
-      <EconomicFlowDiagram />
-
-      <Card className="p-6 bg-primary/10 border-primary">
+      <Card className="p-6 bg-accent/20 border-2 border-accent">
         <div className="flex items-start gap-4">
-          <Vault size={32} weight="fill" className="text-primary flex-shrink-0 mt-1" />
+          <CheckCircle size={48} weight="fill" className="text-success flex-shrink-0 mt-1" />
           <div>
-            <h3 className="font-semibold text-lg mb-2">The Economic Model: Zero-Sum Influence Economy</h3>
-            <p className="text-sm text-muted-foreground mb-3">
-              THE RECORD operates a <strong>closed-loop influence economy</strong> where influence cannot be 
-              purchased with money. Instead, it's earned through accuracy and lost through error. This creates 
-              a sustainable economic model that funds infrastructure while preventing plutocracy.
+            <h2 className="font-bold text-2xl mb-3">CRITICAL: Reporting Is FREE</h2>
+            <p className="text-sm mb-4 leading-relaxed">
+              <strong className="text-accent">You do NOT pay money to submit a signal.</strong> Reporting your 
+              house is on fire costs $0. Reporting a broken streetlight costs $0. Reporting anything costs $0.
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
-              <div className="flex items-center gap-2">
-                <TrendUp size={16} className="text-success" />
-                <span>Revenue from slashing false claims</span>
+            <div className="bg-background/80 p-4 rounded-lg space-y-3">
+              <div>
+                <div className="font-semibold text-base mb-1">What You Pay: $0</div>
+                <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+                  <li>Submit unlimited signals</li>
+                  <li>Vote on proposals</li>
+                  <li>View all data</li>
+                  <li>Earn influence through accuracy</li>
+                </ul>
               </div>
-              <div className="flex items-center gap-2">
-                <Vault size={16} className="text-accent" />
-                <span>Treasury stores operational funds</span>
+              <div>
+                <div className="font-semibold text-base mb-1">What You Risk: Reputation Only</div>
+                <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+                  <li>False reports lose you <strong>influence</strong> (not money)</li>
+                  <li>Influence = your voting weight, earned through accuracy</li>
+                  <li>Cannot be bought, sold, or transferred</li>
+                  <li>Only value: respect in the decision-making system</li>
+                </ul>
               </div>
-              <div className="flex items-center gap-2">
-                <TrendDown size={16} className="text-primary" />
-                <span>Distributed to validators & infrastructure</span>
+              <div className="pt-2 border-t border-border">
+                <p className="text-xs text-muted-foreground italic">
+                  The Record is like calling 911 - free to use, publicly funded, serves the common good.
+                </p>
               </div>
             </div>
           </div>
         </div>
       </Card>
+
+      <Card className="p-6 bg-destructive/20 border-2 border-destructive">
+        <div className="flex items-start gap-4">
+          <WarningCircle size={48} weight="fill" className="text-destructive flex-shrink-0 mt-1" />
+          <div>
+            <h2 className="font-bold text-2xl mb-3">Where Does Money Come From Then?</h2>
+            <p className="text-sm mb-4 leading-relaxed">
+              If users don't pay, how does the system have money to operate? The answer: <strong>Communities 
+              pay for infrastructure, not individuals.</strong>
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-background/80 p-4 rounded-lg">
+                <div className="font-semibold mb-2">Who Pays:</div>
+                <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+                  <li>City/county government budgets</li>
+                  <li>Grant funding (civic tech, foundations)</li>
+                  <li>Optional professional validation fees</li>
+                  <li>Voluntary community donations</li>
+                </ul>
+              </div>
+              <div className="bg-background/80 p-4 rounded-lg">
+                <div className="font-semibold mb-2">What They Pay For:</div>
+                <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+                  <li>Server hosting ($50-70K/year depending on scale)</li>
+                  <li>Data storage (IPFS, decentralized networks)</li>
+                  <li>Validator node operations</li>
+                  <li>Development & security audits</li>
+                </ul>
+              </div>
+            </div>
+            <div className="mt-4 p-3 bg-success/10 rounded border border-success/30 text-sm">
+              <strong>Example:</strong> A city of 100,000 people pays ~$3,500/year = $0.035 per person. 
+              That's <strong>3.5 cents per person per year</strong>. Cheaper than a pencil.
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      <Card className="p-6 bg-primary/10 border-primary">
+        <div className="flex items-start gap-4">
+          <Vault size={32} weight="fill" className="text-primary flex-shrink-0 mt-1" />
+          <div>
+            <h3 className="font-semibold text-lg mb-2">The Economic Model: Influence ≠ Money</h3>
+            <p className="text-sm text-muted-foreground mb-3">
+              THE RECORD operates an <strong>influence economy</strong> where your power comes from being right, 
+              not from having money. Influence is like a credit score - you earn it through good behavior, 
+              lose it through bad behavior, but you can never buy it or sell it.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+              <div className="flex items-center gap-2">
+                <CheckCircle size={16} className="text-success" />
+                <span>Earn influence: Make accurate reports</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <WarningCircle size={16} className="text-destructive" />
+                <span>Lose influence: Make false reports</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Vault size={16} className="text-accent" />
+                <span>Use influence: Higher voting weight</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      <ServerScalingVisualization />
+
+      <AutoScalingVisualization />
+
+      <EconomicFlowDiagram />
 
       <Tabs value={activeEconomicsTab} onValueChange={setActiveEconomicsTab}>
         <TabsList className="grid grid-cols-3 w-full">
