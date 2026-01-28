@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import {
   ShieldCheck,
   Eye,
@@ -29,7 +30,7 @@ interface WelcomeDialogProps {
 export function WelcomeDialog({ open, onGetStarted }: WelcomeDialogProps) {
   return (
     <Dialog open={open} onOpenChange={() => {}}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-3xl h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="font-mono text-3xl">Welcome to THE RECORD</DialogTitle>
           <DialogDescription className="text-base">
@@ -37,7 +38,8 @@ export function WelcomeDialog({ open, onGetStarted }: WelcomeDialogProps) {
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6 py-4">
+        <ScrollArea className="flex-1 pr-4">
+          <div className="space-y-6 py-4">
           <div className="bg-accent/10 border border-accent/30 p-4 rounded-lg">
             <p className="text-sm leading-relaxed">
               THE RECORD is <strong>not a government, voting system, or social network</strong>.
@@ -175,14 +177,15 @@ export function WelcomeDialog({ open, onGetStarted }: WelcomeDialogProps) {
             </div>
           </div>
 
-          <div className="flex justify-end gap-3 pt-4 border-t">
-            <Button onClick={onGetStarted} size="lg" className="w-full md:w-auto">
-              <ShieldCheck size={18} className="mr-2" />
-              Create My Account
-              <ArrowRight size={18} className="ml-2" />
-            </Button>
+            <div className="flex justify-end gap-3 pt-4 border-t">
+              <Button onClick={onGetStarted} size="lg" className="w-full md:w-auto">
+                <ShieldCheck size={18} className="mr-2" />
+                Create My Account
+                <ArrowRight size={18} className="ml-2" />
+              </Button>
+            </div>
           </div>
-        </div>
+        </ScrollArea>
       </DialogContent>
     </Dialog>
   )

@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import { toast } from 'sonner'
 import { 
   PROFESSIONAL_ROLES, 
@@ -123,7 +124,7 @@ export function ProfessionalVerificationDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-3xl h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Certificate size={24} className="text-accent" />
@@ -134,7 +135,8 @@ export function ProfessionalVerificationDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs value={currentStep} onValueChange={(v) => setCurrentStep(v as any)}>
+        <ScrollArea className="flex-1 pr-4">
+          <Tabs value={currentStep} onValueChange={(v) => setCurrentStep(v as any)}>
           <TabsList className="grid grid-cols-4 w-full">
             <TabsTrigger value="role">Role</TabsTrigger>
             <TabsTrigger value="credentials" disabled={!selectedRole}>Credentials</TabsTrigger>
@@ -412,6 +414,7 @@ export function ProfessionalVerificationDialog({
             </Button>
           </TabsContent>
         </Tabs>
+      </ScrollArea>
       </DialogContent>
     </Dialog>
   )

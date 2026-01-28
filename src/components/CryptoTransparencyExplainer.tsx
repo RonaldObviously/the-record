@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import { HardDrives, Globe, ShieldCheck, Warning, Check, X, CloudArrowUp, Database, Lock } from '@phosphor-icons/react'
 
 export function CryptoTransparencyExplainer() {
@@ -14,7 +15,7 @@ export function CryptoTransparencyExplainer() {
           Storage Security
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="text-2xl font-mono">How We Prevent Capture</DialogTitle>
           <DialogDescription className="text-base">
@@ -22,7 +23,8 @@ export function CryptoTransparencyExplainer() {
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs defaultValue="problem" className="mt-6">
+        <ScrollArea className="flex-1 pr-4">
+          <Tabs defaultValue="problem" className="mt-6">
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="problem">The Problem</TabsTrigger>
             <TabsTrigger value="solution">Our Solution</TabsTrigger>
@@ -345,6 +347,7 @@ export function CryptoTransparencyExplainer() {
             </Card>
           </TabsContent>
         </Tabs>
+      </ScrollArea>
       </DialogContent>
     </Dialog>
   )

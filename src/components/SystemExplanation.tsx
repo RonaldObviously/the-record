@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import {
   Dialog,
   DialogContent,
@@ -38,7 +39,7 @@ export function SystemExplanation() {
           How THE RECORD Works
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl h-[85vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="font-mono text-2xl">Understanding THE RECORD</DialogTitle>
           <DialogDescription>
@@ -46,7 +47,8 @@ export function SystemExplanation() {
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs defaultValue="intro" className="w-full">
+        <ScrollArea className="flex-1 pr-4">
+          <Tabs defaultValue="intro" className="w-full">
           <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="intro">Overview</TabsTrigger>
             <TabsTrigger value="how">How It Works</TabsTrigger>
@@ -437,12 +439,13 @@ export function SystemExplanation() {
           </TabsContent>
         </Tabs>
 
-        <div className="flex justify-end gap-3 pt-4 border-t">
+        <div className="flex justify-end gap-3 pt-4 border-t mt-4">
           <Button onClick={() => setOpen(false)}>
             Got it, let's start
             <ArrowRight size={16} className="ml-2" />
           </Button>
         </div>
+      </ScrollArea>
       </DialogContent>
     </Dialog>
   )

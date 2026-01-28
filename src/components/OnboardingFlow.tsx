@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import {
   Dialog,
   DialogContent,
@@ -378,13 +379,14 @@ export function OnboardingFlow({ open, onComplete }: OnboardingFlowProps) {
 
   return (
     <Dialog open={open} onOpenChange={() => {}}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-md h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="font-mono text-2xl">THE RECORD</DialogTitle>
           <DialogDescription>Account Creation & Verification</DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6">
+        <ScrollArea className="flex-1 pr-4">
+          <div className="space-y-6">
           <div className="space-y-2">
             <div className="flex justify-between items-center text-xs text-muted-foreground">
               <span>
@@ -498,6 +500,7 @@ export function OnboardingFlow({ open, onComplete }: OnboardingFlowProps) {
             </Card>
           )}
         </div>
+      </ScrollArea>
       </DialogContent>
 
       <ProfessionalVerificationDialog
