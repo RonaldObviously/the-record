@@ -25,8 +25,10 @@ import { promoteClusterToProblem } from '@/lib/signalLifecycle'
 import type { Bubble, Problem, Proposal, MetaAlert, BlackBoxEvent, Signal, SignalCluster } from '@/lib/types'
 import type { UserAccount } from '@/lib/auth'
 import { canSubmitSignals } from '@/lib/auth'
-import { Plus, Warning, User, Broadcast, MapPin } from '@phosphor-icons/react'
+import { Plus, Warning, User, Broadcast, MapPin, HardDrive } from '@phosphor-icons/react'
 import { toast } from 'sonner'
+import { IPFSStoragePanel } from '@/components/IPFSStoragePanel'
+import { useIPFSStorage } from '@/hooks/use-ipfs-storage'
 
 function App() {
   const [initialized, setInitialized] = useKV<boolean>('system-initialized', false)
@@ -50,6 +52,9 @@ function App() {
   const [showSatelliteMap, setShowSatelliteMap] = useState(false)
   const [currentLayer, setCurrentLayer] = useState<'L1' | 'L2' | 'L3' | 'L4'>('L1')
   const [selectedH3Cell, setSelectedH3Cell] = useState<string | null>(null)
+  const [showIPFSPanel, setShowIPFSPanel] = useState(false)
+
+  const ipfs = useIPFSStorage()
 
   useEffect(() => {
     if (!initialized) {
@@ -83,7 +88,7 @@ function App() {
   const bubbleProblems = safeProblems.filter(p => p.bubbleId === selectedBubbleId)
   const bubbleProposals = safeProposals.filter(p => p.bubbleId === selectedBubbleId)
 
-  const handleSubmitSignal = (signal: Signal) => {
+  const handleSubmitSignal = async (signal: Signal) => {
     if (!userAccount || !canSubmitSignals(userAccount)) {
       toast.error('You need a humanity score of 30+ to submit signals')
       return
@@ -104,6 +109,11 @@ function App() {
       previousHash: safeBlackBox[safeBlackBox.length - 1]?.hash || 'genesis',
     }
     setBlackBox((current) => [...(current || []), event])
+    
+    if (ipfs.state.initialized) {
+      await ipfs.storeSignal(signal)
+      await ipfs.storeBlackBoxEvent(event)
+    }
     
     toast.success('Signal submitted to L1 layer')
   }
@@ -137,21 +147,31 @@ function App() {
     toast.success(`Cluster promoted to Problem: "${problem.description}"`)
   }
 
-  const handleSubmitProblem = (problem: Problem) => {
+  const handleSubmitProblem = async (problem: Problem) => {
     if (!userAccount || !canSubmitSignals(userAccount)) {
       toast.error('You need a humanity score of 30+ to submit signals')
       return
     }
     setProblems((current) => [...(current || []), problem])
+    
+    if (ipfs.state.initialized) {
+      await ipfs.storeProblem(problem)
+    }
+    
     toast.success('Problem submitted anonymously')
   }
 
-  const handleSubmitProposal = (proposal: Proposal) => {
+  const handleSubmitProposal = async (proposal: Proposal) => {
     if (!userAccount || !canSubmitSignals(userAccount)) {
       toast.error('You need a humanity score of 30+ to submit proposals')
       return
     }
     setProposals((current) => [...(current || []), proposal])
+    
+    if (ipfs.state.initialized) {
+      await ipfs.storeProposal(proposal)
+    }
+    
     toast.success('Proposal submitted for validation')
   }
 
@@ -182,6 +202,41 @@ function App() {
     toast.info('Click to submit a signal at this mesh location')
   }
 
+  const handleCreateIPFSBackup = async () => {
+    if (!ipfs.state.initialized) {
+      toast.error('IPFS not initialized')
+      return
+    }
+
+    const metadata = await ipfs.storeBatch(
+      safeSignals,
+      safeProblems,
+      safeProposals,
+      safeBlackBox
+    )
+
+    if (metadata) {
+      toast.success(`Backup created: ${metadata.cid}`, { duration: 10000 })
+    }
+  }
+
+  const handleRestoreIPFSBackup = async (backup: any) => {
+    if (backup.signals) setSignals(backup.signals)
+    if (backup.problems) setProblems(backup.problems)
+    if (backup.proposals) setProposals(backup.proposals)
+    if (backup.blackBoxEvents) setBlackBox(backup.blackBoxEvents)
+  }
+
+  useEffect(() => {
+    if (ipfs.autoBackupEnabled && ipfs.state.initialized) {
+      const interval = setInterval(() => {
+        handleCreateIPFSBackup()
+      }, 5 * 60 * 1000)
+
+      return () => clearInterval(interval)
+    }
+  }, [ipfs.autoBackupEnabled, ipfs.state.initialized, safeSignals.length, safeProblems.length, safeProposals.length, safeBlackBox.length])
+
   const criticalAlerts = safeMetaAlerts.filter(a => a.severity === 'critical' || a.severity === 'high')
 
   return (
@@ -198,6 +253,14 @@ function App() {
             <div className="flex items-center gap-3">
               <SystemExplanation />
               <CryptoTransparencyExplainer />
+              <Button
+                variant={ipfs.state.initialized ? "default" : "outline"}
+                size="sm"
+                onClick={() => setShowIPFSPanel(true)}
+              >
+                <HardDrive size={16} className="mr-1.5" />
+                IPFS Storage
+              </Button>
               {userAccount && (
                 <Button
                   variant="outline"
@@ -497,6 +560,12 @@ function App() {
 
       <WelcomeDialog open={showWelcome} onGetStarted={handleStartOnboarding} />
       <OnboardingFlow open={showOnboarding} onComplete={handleOnboardingComplete} />
+      <IPFSStoragePanel
+        open={showIPFSPanel}
+        onOpenChange={setShowIPFSPanel}
+        onBackupCreated={handleCreateIPFSBackup}
+        onBackupRestored={handleRestoreIPFSBackup}
+      />
     </div>
   )
 }

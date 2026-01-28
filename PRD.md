@@ -48,11 +48,18 @@ This is a multi-layered governance system with hierarchical navigation, cryptogr
 - Success criteria: Alerts are timely; severity levels are clear; monitoring is independent
 
 **Black Box Event Log**
-- Functionality: Immutable hash-chained event ledger showing all system activity
-- Purpose: Provide cryptographic proof of data integrity and complete audit trail
+- Functionality: Immutable hash-chained event ledger showing all system activity, with IPFS backup
+- Purpose: Provide cryptographic proof of data integrity, complete audit trail, and decentralized storage
 - Trigger: Automatic logging of all problems, proposals, validations, predictions
-- Progression: Event occurs → Hash calculated → Linked to previous hash → Added to chain → Displayed in log
-- Success criteria: Hash chain is verifiable; tampering is detectable; events are immutable
+- Progression: Event occurs → Hash calculated → Linked to previous hash → Stored to IPFS (if enabled) → Added to chain → Displayed in log
+- Success criteria: Hash chain is verifiable; tampering is detectable; events are immutable; IPFS CID recorded
+
+**IPFS Decentralized Storage**
+- Functionality: Store all signals, problems, proposals, and black box events on peer-to-peer IPFS network
+- Purpose: Prevent censorship, ensure data cannot be deleted by single entity, provide tamper-proof storage
+- Trigger: User initializes IPFS node; automatic storage on submission; periodic backups
+- Progression: Initialize node → Content stored to IPFS → CID generated → Content pinned → Network propagation → Backup/restore capability
+- Success criteria: Node runs in browser; automatic storage works; backups can be restored; pinned content persists
 
 **System Health Dashboard**
 - Functionality: Real-time monitoring of validator network, security analysis, cryptographic verification
