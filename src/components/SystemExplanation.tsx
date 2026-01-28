@@ -24,6 +24,8 @@ import {
   ChartLine,
   Question,
 } from '@phosphor-icons/react'
+import { SignalFlowDiagram } from '@/components/SignalFlowDiagram'
+import { LiveSignalFlowDemo } from '@/components/LiveSignalFlowDemo'
 
 export function SystemExplanation() {
   const [open, setOpen] = useState(false)
@@ -45,9 +47,11 @@ export function SystemExplanation() {
         </DialogHeader>
 
         <Tabs defaultValue="intro" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="intro">Overview</TabsTrigger>
             <TabsTrigger value="how">How It Works</TabsTrigger>
+            <TabsTrigger value="flow">Signal Flow</TabsTrigger>
+            <TabsTrigger value="demo">Live Demo</TabsTrigger>
             <TabsTrigger value="why">Why Different</TabsTrigger>
             <TabsTrigger value="layers">4 Layers</TabsTrigger>
           </TabsList>
@@ -218,6 +222,14 @@ export function SystemExplanation() {
                 </Card>
               </div>
             </div>
+          </TabsContent>
+
+          <TabsContent value="flow" className="space-y-6 mt-6">
+            <SignalFlowDiagram />
+          </TabsContent>
+
+          <TabsContent value="demo" className="space-y-6 mt-6">
+            <LiveSignalFlowDemo />
           </TabsContent>
 
           <TabsContent value="why" className="space-y-6 mt-6">
