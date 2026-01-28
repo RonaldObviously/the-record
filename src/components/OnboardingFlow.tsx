@@ -33,8 +33,11 @@ import {
   ArrowRight,
   ShieldCheck,
   Warning,
+  Certificate,
 } from '@phosphor-icons/react'
 import { toast } from 'sonner'
+import { ProfessionalVerificationDialog } from '@/components/ProfessionalVerificationDialog'
+import { addProfessionalVerification, type ProfessionalProfile } from '@/lib/professionalVerification'
 
 interface OnboardingFlowProps {
   open: boolean
@@ -47,6 +50,7 @@ export function OnboardingFlow({ open, onComplete }: OnboardingFlowProps) {
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null)
+  const [showProfessionalDialog, setShowProfessionalDialog] = useState(false)
 
   const currentStep = ONBOARDING_STEPS[step]
   const progress = ((step + 1) / ONBOARDING_STEPS.length) * 100
@@ -465,8 +469,48 @@ export function OnboardingFlow({ open, onComplete }: OnboardingFlowProps) {
               </Card>
             </motion.div>
           </AnimatePresence>
+
+          {account && canSubmitSignals(account) && (
+            <Card className="bg-accent/10 border-accent/30">
+              <CardContent className="pt-6">
+                <div className="space-y-4">
+                  <div className="flex items-start gap-3">
+                    <Certificate size={24} className="text-accent flex-shrink-0 mt-0.5" />
+                    <div className="flex-1">
+                      <h4 className="font-semibold text-sm mb-1">Are you a professional?</h4>
+                      <p className="text-xs text-muted-foreground mb-3">
+                        Engineers, inspectors, public officials, and other verified professionals can 
+                        contribute with enhanced credibility while maintaining the system's integrity.
+                      </p>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setShowProfessionalDialog(true)}
+                        className="border-accent hover:bg-accent/20"
+                      >
+                        <Certificate size={16} className="mr-2" />
+                        Apply for Professional Verification
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </DialogContent>
+
+      <ProfessionalVerificationDialog
+        open={showProfessionalDialog}
+        onOpenChange={setShowProfessionalDialog}
+        onComplete={(profile: ProfessionalProfile) => {
+          if (account) {
+            const updatedAccount = addProfessionalVerification(account, profile)
+            setAccount(updatedAccount)
+            toast.success(`Professional verification complete: ${profile.role}`)
+          }
+        }}
+      />
     </Dialog>
   )
 }

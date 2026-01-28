@@ -1,7 +1,9 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
+import { Separator } from '@/components/ui/separator'
 import type { UserAccount } from '@/lib/auth'
+import { ProfessionalBadge } from '@/components/ProfessionalBadge'
 import {
   ShieldCheck,
   Key,
@@ -92,6 +94,12 @@ export function AccountDashboard({ account }: AccountDashboardProps) {
               ))}
             </div>
           </div>
+
+          {account.professionalProfile && (
+            <div className="border-t border-border/50 pt-4">
+              <ProfessionalBadge profile={account.professionalProfile} />
+            </div>
+          )}
 
           <div className="border-t border-border/50 pt-4 space-y-2">
             <p className="text-xs font-semibold text-muted-foreground">Capabilities</p>

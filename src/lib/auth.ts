@@ -1,5 +1,6 @@
 import { createHash } from './crypto'
 import type { LocationProof } from './anti-vpn'
+import type { ProfessionalProfile } from './professionalVerification'
 
 export interface UserAccount {
   id: string
@@ -20,6 +21,7 @@ export interface UserAccount {
   lastLocationVerification?: Date
   vpnDetected: boolean
   suspiciousActivityCount: number
+  professionalProfile?: ProfessionalProfile
 }
 
 export interface VerificationSignal {
