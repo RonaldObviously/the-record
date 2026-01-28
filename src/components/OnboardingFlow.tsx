@@ -379,14 +379,16 @@ export function OnboardingFlow({ open, onComplete }: OnboardingFlowProps) {
 
   return (
     <Dialog open={open} onOpenChange={() => {}}>
-      <DialogContent className="max-w-md h-[90vh] flex flex-col">
-        <DialogHeader>
-          <DialogTitle className="font-mono text-2xl">THE RECORD</DialogTitle>
-          <DialogDescription>Account Creation & Verification</DialogDescription>
-        </DialogHeader>
+      <DialogContent className="max-w-md max-h-[90vh] flex flex-col p-0 gap-0">
+        <div className="px-6 pt-6 pb-4 shrink-0">
+          <DialogHeader>
+            <DialogTitle className="font-mono text-2xl">THE RECORD</DialogTitle>
+            <DialogDescription>Account Creation & Verification</DialogDescription>
+          </DialogHeader>
+        </div>
 
-        <ScrollArea className="flex-1 pr-4">
-          <div className="space-y-6">
+        <ScrollArea className="flex-1 px-6">
+          <div className="space-y-6 pb-4 pr-4">
           <div className="space-y-2">
             <div className="flex justify-between items-center text-xs text-muted-foreground">
               <span>

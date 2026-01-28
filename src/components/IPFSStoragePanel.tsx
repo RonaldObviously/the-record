@@ -89,19 +89,21 @@ export function IPFSStoragePanel({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Cloud size={24} className="text-primary" />
-            IPFS Decentralized Storage
-          </DialogTitle>
-          <DialogDescription>
-            Store signals, problems, and proposals on a decentralized peer-to-peer network
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col p-0 gap-0">
+        <div className="px-6 pt-6 pb-4 shrink-0">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Cloud size={24} className="text-primary" />
+              IPFS Decentralized Storage
+            </DialogTitle>
+            <DialogDescription>
+              Store signals, problems, and proposals on a decentralized peer-to-peer network
+            </DialogDescription>
+          </DialogHeader>
+        </div>
 
-        <ScrollArea className="flex-1 pr-4">
-          <div className="space-y-6">
+        <ScrollArea className="flex-1 px-6">
+          <div className="space-y-6 pb-4 pr-4">
             <Card className="p-4 border-primary/20">
               <div className="flex items-start gap-3">
                 <Info size={20} className="text-primary mt-0.5 flex-shrink-0" />

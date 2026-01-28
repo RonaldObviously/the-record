@@ -124,19 +124,21 @@ export function ProfessionalVerificationDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl h-[90vh] flex flex-col">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Certificate size={24} className="text-accent" />
-            Professional Verification
-          </DialogTitle>
-          <DialogDescription>
-            Connect as a verified professional to contribute with enhanced credibility
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col p-0 gap-0">
+        <div className="px-6 pt-6 pb-4 shrink-0">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Certificate size={24} className="text-accent" />
+              Professional Verification
+            </DialogTitle>
+            <DialogDescription>
+              Connect as a verified professional to contribute with enhanced credibility
+            </DialogDescription>
+          </DialogHeader>
+        </div>
 
-        <ScrollArea className="flex-1 pr-4">
-          <Tabs value={currentStep} onValueChange={(v) => setCurrentStep(v as any)}>
+        <ScrollArea className="flex-1 px-6">
+          <Tabs value={currentStep} onValueChange={(v) => setCurrentStep(v as any)} className="pb-4 pr-4">
           <TabsList className="grid grid-cols-4 w-full">
             <TabsTrigger value="role">Role</TabsTrigger>
             <TabsTrigger value="credentials" disabled={!selectedRole}>Credentials</TabsTrigger>

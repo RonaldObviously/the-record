@@ -186,19 +186,22 @@ export function SubmitSignalDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] flex flex-col">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            Submit Signal
-            <ContextualHelp {...helpContent.signals} />
-          </DialogTitle>
-          <DialogDescription>
-            Report an issue or observation in this area. Your submission is anonymous and uses H3
-            geospatial blurring to protect your privacy.
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] flex flex-col p-0 gap-0">
+        <div className="px-6 pt-6 pb-4 shrink-0">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              Submit Signal
+              <ContextualHelp {...helpContent.signals} />
+            </DialogTitle>
+            <DialogDescription>
+              Report an issue or observation in this area. Your submission is anonymous and uses H3
+              geospatial blurring to protect your privacy.
+            </DialogDescription>
+          </DialogHeader>
+        </div>
         
-        <ScrollArea className="flex-1 pr-4">
+        <ScrollArea className="flex-1 px-6">
+          <div className="pb-4 pr-4">
           <div className="bg-accent/10 border border-accent/30 p-3 rounded-lg mb-4">
             <p className="text-xs text-muted-foreground leading-relaxed">
               <strong className="text-foreground">Why anonymous?</strong> Private input prevents
@@ -381,20 +384,23 @@ export function SubmitSignalDialog({
                 : 'Your account will be publicly linked to this signal. This increases trust but reduces privacy.'}
             </p>
           </div>
-        </div>
+          </div>
+          </div>
         </ScrollArea>
 
-        <DialogFooter className="flex-shrink-0">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
-          </Button>
-          <Button 
-            onClick={handleSubmit}
-            disabled={locationProof?.isVPN || locationProof?.isTor}
-          >
-            Submit Signal
-          </Button>
-        </DialogFooter>
+        <div className="px-6 py-4 border-t shrink-0">
+          <DialogFooter>
+            <Button variant="outline" onClick={() => onOpenChange(false)}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleSubmit}
+              disabled={locationProof?.isVPN || locationProof?.isTor}
+            >
+              Submit Signal
+            </Button>
+          </DialogFooter>
+        </div>
       </DialogContent>
 
       <LocationVerificationExplainer

@@ -15,16 +15,18 @@ export function CryptoTransparencyExplainer() {
           Storage Security
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-4xl h-[90vh] flex flex-col">
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-mono">How We Prevent Capture</DialogTitle>
-          <DialogDescription className="text-base">
-            Why THE RECORD can't be controlled by any single entity—explained simply
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col p-0 gap-0">
+        <div className="px-6 pt-6 pb-4 shrink-0">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-mono">How We Prevent Capture</DialogTitle>
+            <DialogDescription className="text-base">
+              Why THE RECORD can't be controlled by any single entity—explained simply
+            </DialogDescription>
+          </DialogHeader>
+        </div>
 
-        <ScrollArea className="flex-1 pr-4">
-          <Tabs defaultValue="problem" className="mt-6">
+        <ScrollArea className="flex-1 px-6">
+          <Tabs defaultValue="problem" className="mt-6 pb-4 pr-4">
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="problem">The Problem</TabsTrigger>
             <TabsTrigger value="solution">Our Solution</TabsTrigger>

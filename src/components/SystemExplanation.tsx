@@ -39,16 +39,18 @@ export function SystemExplanation() {
           How THE RECORD Works
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-4xl h-[85vh] flex flex-col">
-        <DialogHeader>
-          <DialogTitle className="font-mono text-2xl">Understanding THE RECORD</DialogTitle>
-          <DialogDescription>
-            A transparent coordination engine for collective decision-making
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className="max-w-4xl max-h-[85vh] flex flex-col p-0 gap-0">
+        <div className="px-6 pt-6 pb-4 shrink-0">
+          <DialogHeader>
+            <DialogTitle className="font-mono text-2xl">Understanding THE RECORD</DialogTitle>
+            <DialogDescription>
+              A transparent coordination engine for collective decision-making
+            </DialogDescription>
+          </DialogHeader>
+        </div>
 
-        <ScrollArea className="flex-1 pr-4">
-          <Tabs defaultValue="intro" className="w-full">
+        <ScrollArea className="flex-1 px-6">
+          <Tabs defaultValue="intro" className="w-full pb-4 pr-4">
           <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="intro">Overview</TabsTrigger>
             <TabsTrigger value="how">How It Works</TabsTrigger>
