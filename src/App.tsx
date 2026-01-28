@@ -11,9 +11,13 @@ import { MetaAlertPanel } from '@/components/MetaAlertPanel'
 import { SubmitProblemDialog } from '@/components/SubmitProblemDialog'
 import { SubmitProposalDialog } from '@/components/SubmitProposalDialog'
 import { BlackBoxLog } from '@/components/BlackBoxLog'
+import { OnboardingFlow } from '@/components/OnboardingFlow'
+import { AccountDashboard } from '@/components/AccountDashboard'
 import { initializeSystem } from '@/lib/seedData'
 import type { Bubble, Problem, Proposal, MetaAlert, BlackBoxEvent } from '@/lib/types'
-import { Plus, Warning } from '@phosphor-icons/react'
+import type { UserAccount } from '@/lib/auth'
+import { canSubmitSignals } from '@/lib/auth'
+import { Plus, Warning, User } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 
 function App() {
@@ -23,11 +27,14 @@ function App() {
   const [proposals, setProposals] = useKV<Proposal[]>('proposals', [])
   const [metaAlerts, setMetaAlerts] = useKV<MetaAlert[]>('meta-alerts', [])
   const [blackBox, setBlackBox] = useKV<BlackBoxEvent[]>('black-box', [])
+  const [userAccount, setUserAccount] = useKV<UserAccount | null>('user-account', null)
   
   const [selectedBubbleId, setSelectedBubbleId] = useState<string | null>(null)
   const [showProblemDialog, setShowProblemDialog] = useState(false)
   const [showProposalDialog, setShowProposalDialog] = useState(false)
   const [showSystemHealth, setShowSystemHealth] = useState(false)
+  const [showOnboarding, setShowOnboarding] = useState(false)
+  const [showAccountDashboard, setShowAccountDashboard] = useState(false)
   const [currentLayer, setCurrentLayer] = useState<'L1' | 'L2' | 'L3' | 'L4'>('L1')
 
   useEffect(() => {
@@ -43,6 +50,12 @@ function App() {
     }
   }, [initialized])
 
+  useEffect(() => {
+    if (!userAccount && initialized) {
+      setShowOnboarding(true)
+    }
+  }, [userAccount, initialized])
+
   const safeBubbles = Array.isArray(bubbles) ? bubbles : []
   const safeProblems = Array.isArray(problems) ? problems : []
   const safeProposals = Array.isArray(proposals) ? proposals : []
@@ -54,13 +67,27 @@ function App() {
   const bubbleProposals = safeProposals.filter(p => p.bubbleId === selectedBubbleId)
 
   const handleSubmitProblem = (problem: Problem) => {
+    if (!userAccount || !canSubmitSignals(userAccount)) {
+      toast.error('You need a humanity score of 30+ to submit signals')
+      return
+    }
     setProblems((current) => [...(current || []), problem])
     toast.success('Problem submitted anonymously')
   }
 
   const handleSubmitProposal = (proposal: Proposal) => {
+    if (!userAccount || !canSubmitSignals(userAccount)) {
+      toast.error('You need a humanity score of 30+ to submit proposals')
+      return
+    }
     setProposals((current) => [...(current || []), proposal])
     toast.success('Proposal submitted for validation')
+  }
+
+  const handleOnboardingComplete = (account: UserAccount) => {
+    setUserAccount(account)
+    setShowOnboarding(false)
+    toast.success(`Welcome to THE RECORD, ${account.id}!`)
   }
 
   const criticalAlerts = safeMetaAlerts.filter(a => a.severity === 'critical' || a.severity === 'high')
@@ -77,6 +104,16 @@ function App() {
               </p>
             </div>
             <div className="flex items-center gap-3">
+              {userAccount && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowAccountDashboard(!showAccountDashboard)}
+                >
+                  <User size={16} className="mr-1.5" />
+                  Account
+                </Button>
+              )}
               <Button
                 variant="outline"
                 size="sm"
@@ -84,7 +121,7 @@ function App() {
               >
                 System Health
               </Button>
-              {selectedBubbleId && (
+              {selectedBubbleId && userAccount && canSubmitSignals(userAccount) && (
                 <>
                   <Button
                     variant="outline"
@@ -102,6 +139,11 @@ function App() {
                     Submit Proposal
                   </Button>
                 </>
+              )}
+              {!userAccount && (
+                <Button size="sm" onClick={() => setShowOnboarding(true)}>
+                  Create Account
+                </Button>
               )}
             </div>
           </div>
@@ -191,14 +233,17 @@ function App() {
               )}
             </div>
 
-            <div className="lg:col-span-1">
+            <div className="lg:col-span-1 space-y-6">
+              {userAccount && showAccountDashboard && (
+                <AccountDashboard account={userAccount} />
+              )}
               <BlackBoxLog events={safeBlackBox.slice(-20)} />
             </div>
           </div>
         )}
       </main>
 
-      {selectedBubbleId && (
+      {selectedBubbleId && userAccount && (
         <>
           <SubmitProblemDialog
             open={showProblemDialog}
@@ -215,6 +260,8 @@ function App() {
           />
         </>
       )}
+
+      <OnboardingFlow open={showOnboarding} onComplete={handleOnboardingComplete} />
     </div>
   )
 }
