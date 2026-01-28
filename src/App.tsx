@@ -36,11 +36,15 @@ import { IPFSStoragePanel } from '@/components/IPFSStoragePanel'
 import { useIPFSStorage } from '@/hooks/use-ipfs-storage'
 import { ClusteringExplainer } from '@/components/ClusteringExplainer'
 import { ResearchSystemExplainer } from '@/components/ResearchSystemExplainer'
+import { HierarchicalClusteringMonitor } from '@/components/HierarchicalClusteringMonitor'
+import { HierarchicalClusteringDiagram } from '@/components/HierarchicalClusteringDiagram'
+import { processHierarchicalClustering } from '@/lib/hierarchicalClustering'
 
 function App() {
   const [initialized, setInitialized] = useKV<boolean>('system-initialized', false)
   const [bubbles, setBubbles] = useKV<Bubble[]>('bubbles', [])
   const [signals, setSignals] = useKV<Signal[]>('signals', [])
+  const [clusters, setClusters] = useKV<SignalCluster[]>('clusters', [])
   const [problems, setProblems] = useKV<Problem[]>('problems', [])
   const [proposals, setProposals] = useKV<Proposal[]>('proposals', [])
   const [metaAlerts, setMetaAlerts] = useKV<MetaAlert[]>('meta-alerts', [])
@@ -61,6 +65,7 @@ function App() {
   const [selectedH3Cell, setSelectedH3Cell] = useState<string | null>(null)
   const [showIPFSPanel, setShowIPFSPanel] = useState(false)
   const [showCostBreakdown, setShowCostBreakdown] = useState(false)
+  const [showClusteringMonitor, setShowClusteringMonitor] = useState(false)
 
   const ipfs = useIPFSStorage()
 
@@ -86,6 +91,7 @@ function App() {
 
   const safeBubbles = Array.isArray(bubbles) ? bubbles : []
   const safeSignals = Array.isArray(signals) ? signals : []
+  const safeClusters = Array.isArray(clusters) ? clusters : []
   const safeProblems = Array.isArray(problems) ? problems : []
   const safeProposals = Array.isArray(proposals) ? proposals : []
   const safeMetaAlerts = Array.isArray(metaAlerts) ? metaAlerts : []
@@ -127,6 +133,8 @@ function App() {
   }
 
   const handleClusterPromoted = (cluster: SignalCluster) => {
+    setClusters((current) => [...(current || []), cluster])
+    
     const problem = promoteClusterToProblem(cluster)
     setProblems((current) => [...(current || []), problem])
     
@@ -146,13 +154,14 @@ function App() {
         clusterId: cluster.id,
         problemId: problem.id,
         signalCount: cluster.signals.length,
+        level: cluster.level,
       },
       hash: `hash-${Date.now()}`,
       previousHash: safeBlackBox[safeBlackBox.length - 1]?.hash || 'genesis',
     }
     setBlackBox((current) => [...(current || []), event])
     
-    toast.success(`Cluster promoted to Problem: "${problem.description}"`)
+    toast.success(`L${cluster.level} cluster promoted to Problem: "${problem.description}"`)
   }
 
   const handleSubmitProblem = async (problem: Problem) => {
@@ -193,6 +202,49 @@ function App() {
   const handleStartOnboarding = () => {
     setShowWelcome(false)
     setShowOnboarding(true)
+  }
+
+  const handleTriggerHierarchicalClustering = (level: 2 | 3 | 4) => {
+    const safeClusters = Array.isArray(clusters) ? clusters : []
+    const result = processHierarchicalClustering(safeClusters)
+    
+    const newClusters = [
+      ...safeClusters,
+      ...result.l2Clusters,
+      ...result.l3Clusters,
+      ...result.l4Clusters,
+    ]
+    
+    setClusters(newClusters)
+    
+    result.promotionEvents.forEach(event => {
+      const blackBoxEvent: BlackBoxEvent = {
+        id: `event-${Date.now()}-${Math.random()}`,
+        type: 'cluster-promoted',
+        timestamp: event.timestamp,
+        data: {
+          fromLevel: event.fromLevel,
+          toLevel: event.toLevel,
+          clusterId: event.clusterId,
+          childClusterIds: event.childClusterIds,
+          weight: event.weight,
+          reason: event.reason,
+        },
+        hash: `hash-${Date.now()}`,
+        previousHash: safeBlackBox[safeBlackBox.length - 1]?.hash || 'genesis',
+      }
+      setBlackBox((current) => [...(current || []), blackBoxEvent])
+    })
+    
+    if (result.promotionEvents.length > 0) {
+      toast.success(
+        `Hierarchical clustering complete: ${result.promotionEvents.length} cluster${
+          result.promotionEvents.length > 1 ? 's' : ''
+        } promoted to L${level}`
+      )
+    } else {
+      toast.info('No clusters ready for promotion yet')
+    }
   }
 
   const handleMeshCellClick = (position: { x: number; y: number }) => {
@@ -276,6 +328,13 @@ function App() {
                 Cost Breakdown
               </Button>
               <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowClusteringMonitor(!showClusteringMonitor)}
+              >
+                Hierarchical Clustering
+              </Button>
+              <Button
                 variant={ipfs.state.initialized ? "default" : "outline"}
                 size="sm"
                 onClick={() => setShowIPFSPanel(true)}
@@ -356,7 +415,20 @@ function App() {
       )}
 
       <main className="container mx-auto px-6 py-8 max-w-7xl">
-        {showCostBreakdown ? (
+        {showClusteringMonitor ? (
+          <div className="space-y-6">
+            <Button variant="outline" onClick={() => setShowClusteringMonitor(false)}>
+              ← Back to Main View
+            </Button>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <HierarchicalClusteringMonitor
+                allClusters={safeClusters}
+                onTriggerClustering={handleTriggerHierarchicalClustering}
+              />
+              <HierarchicalClusteringDiagram />
+            </div>
+          </div>
+        ) : showCostBreakdown ? (
           <div className="space-y-6">
             <Button variant="outline" onClick={() => setShowCostBreakdown(false)}>
               ← Back to Main View
