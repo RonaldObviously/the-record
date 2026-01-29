@@ -25,12 +25,15 @@ import { DataIntegrityExplainer } from '@/components/DataIntegrityExplainer'
 import { InfluenceVsMoneyBreakdown } from '@/components/InfluenceVsMoneyBreakdown'
 import { AccountabilityExplainer } from '@/components/AccountabilityExplainer'
 import { SignalLifecycleExplainer } from '@/components/SignalLifecycleExplainer'
+import { ValidatorQuorumPanel } from '@/components/ValidatorQuorumPanel'
 import { initializeSystem } from '@/lib/seedData'
 import { promoteClusterToProblem } from '@/lib/signalLifecycle'
 import type { Bubble, Problem, Proposal, MetaAlert, BlackBoxEvent, Signal, SignalCluster } from '@/lib/types'
 import type { UserAccount } from '@/lib/auth'
 import { canSubmitSignals } from '@/lib/auth'
-import { Plus, Warning, User, Broadcast, MapPin, HardDrive, CurrencyDollar } from '@phosphor-icons/react'
+import type { Validator, CredentialValidationRequest } from '@/lib/professionalValidatorQuorum'
+import { generateMockValidatorNetwork, generateMockValidationRequests } from '@/lib/mockValidatorData'
+import { Plus, Warning, User, Broadcast, MapPin, HardDrive, CurrencyDollar, ShieldCheck } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 import { IPFSStoragePanel } from '@/components/IPFSStoragePanel'
 import { useIPFSStorage } from '@/hooks/use-ipfs-storage'
@@ -50,6 +53,8 @@ function App() {
   const [metaAlerts, setMetaAlerts] = useKV<MetaAlert[]>('meta-alerts', [])
   const [blackBox, setBlackBox] = useKV<BlackBoxEvent[]>('black-box', [])
   const [userAccount, setUserAccount] = useKV<UserAccount | null>('user-account', null)
+  const [validators, setValidators] = useKV<Validator[]>('validators', [])
+  const [validationRequests, setValidationRequests] = useKV<CredentialValidationRequest[]>('validation-requests', [])
   
   const [selectedBubbleId, setSelectedBubbleId] = useState<string | null>(null)
   const [showSignalDialog, setShowSignalDialog] = useState(false)
@@ -66,6 +71,7 @@ function App() {
   const [showIPFSPanel, setShowIPFSPanel] = useState(false)
   const [showCostBreakdown, setShowCostBreakdown] = useState(false)
   const [showClusteringMonitor, setShowClusteringMonitor] = useState(false)
+  const [showValidatorPanel, setShowValidatorPanel] = useState(false)
 
   const ipfs = useIPFSStorage()
 
@@ -78,6 +84,13 @@ function App() {
       setMetaAlerts(data.metaAlerts)
       setBlackBox(data.blackBox)
       setSignals([])
+      
+      const mockValidators = generateMockValidatorNetwork()
+      setValidators(mockValidators)
+      
+      const mockRequests = generateMockValidationRequests(mockValidators, 15)
+      setValidationRequests(mockRequests)
+      
       setInitialized(true)
       toast.success('THE RECORD initialized')
     }
@@ -96,6 +109,8 @@ function App() {
   const safeProposals = Array.isArray(proposals) ? proposals : []
   const safeMetaAlerts = Array.isArray(metaAlerts) ? metaAlerts : []
   const safeBlackBox = Array.isArray(blackBox) ? blackBox : []
+  const safeValidators = Array.isArray(validators) ? validators : []
+  const safeValidationRequests = Array.isArray(validationRequests) ? validationRequests : []
 
   const selectedBubble = safeBubbles.find(b => b.id === selectedBubbleId)
   const bubbleSignals = safeSignals.filter(s => s.bubbleId === selectedBubbleId)
@@ -372,6 +387,14 @@ function App() {
               <Button
                 variant="outline"
                 size="sm"
+                onClick={() => setShowValidatorPanel(!showValidatorPanel)}
+              >
+                <ShieldCheck size={16} className="mr-1.5" />
+                Validators ({safeValidators.length})
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => setShowCostBreakdown(true)}
               >
                 <CurrencyDollar size={16} className="mr-1.5" />
@@ -465,7 +488,23 @@ function App() {
       )}
 
       <main className="container mx-auto px-6 py-8 max-w-7xl">
-        {showClusteringMonitor ? (
+        {showValidatorPanel ? (
+          <div className="space-y-6">
+            <Button variant="outline" onClick={() => setShowValidatorPanel(false)}>
+              ← Back to Main View
+            </Button>
+            <ValidatorQuorumPanel
+              validators={safeValidators}
+              validationRequests={safeValidationRequests}
+              onValidationComplete={(request) => {
+                setValidationRequests((current) =>
+                  (current || []).map(r => r.id === request.id ? request : r)
+                )
+                toast.success('Validation completed')
+              }}
+            />
+          </div>
+        ) : showClusteringMonitor ? (
           <div className="space-y-6">
             <Button variant="outline" onClick={() => setShowClusteringMonitor(false)}>
               ← Back to Main View
