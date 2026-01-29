@@ -31,6 +31,7 @@ import { ClusteringExplainer } from '@/components/ClusteringExplainer'
 import { ResearchSystemExplainer } from '@/components/ResearchSystemExplainer'
 import { HierarchicalClusteringMonitor } from '@/components/HierarchicalClusteringMonitor'
 import { HierarchicalClusteringDiagram } from '@/components/HierarchicalClusteringDiagram'
+import { VideoWalkthrough } from '@/components/VideoWalkthrough'
 import { initializeSystem } from '@/lib/seedData'
 import { promoteClusterToProblem } from '@/lib/signalLifecycle'
 import { processHierarchicalClustering } from '@/lib/hierarchicalClustering'
@@ -39,7 +40,7 @@ import type { UserAccount } from '@/lib/auth'
 import { canSubmitSignals } from '@/lib/auth'
 import type { Validator, CredentialValidationRequest } from '@/lib/professionalValidatorQuorum'
 import { generateMockValidatorNetwork, generateMockValidationRequests } from '@/lib/mockValidatorData'
-import { Plus, User, MapPin, Info, ChartBar, House } from '@phosphor-icons/react'
+import { Plus, User, MapPin, Info, ChartBar, House, PlayCircle } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 import { useIPFSStorage } from '@/hooks/use-ipfs-storage'
 
@@ -56,7 +57,7 @@ function App() {
   const [validators, setValidators] = useKV<Validator[]>('validators', [])
   const [validationRequests, setValidationRequests] = useKV<CredentialValidationRequest[]>('validation-requests', [])
   
-  const [currentView, setCurrentView] = useState<'home' | 'map' | 'learn' | 'transparency'>('home')
+  const [currentView, setCurrentView] = useState<'home' | 'map' | 'learn' | 'transparency' | 'walkthrough'>('home')
   const [selectedBubbleId, setSelectedBubbleId] = useState<string | null>(null)
   const [showSignalDialog, setShowSignalDialog] = useState(false)
   const [showProblemDialog, setShowProblemDialog] = useState(false)
@@ -367,6 +368,14 @@ function App() {
               >
                 <ChartBar size={16} className="mr-1.5" />
                 Transparency
+              </Button>
+              <Button
+                variant={currentView === 'walkthrough' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setCurrentView('walkthrough')}
+              >
+                <PlayCircle size={16} className="mr-1.5" />
+                Demo Guide
               </Button>
 
               {userAccount && (
@@ -708,6 +717,10 @@ function App() {
               <BlackBoxLog events={safeBlackBox} />
             </Card>
           </div>
+        )}
+
+        {currentView === 'walkthrough' && (
+          <VideoWalkthrough />
         )}
       </main>
 
