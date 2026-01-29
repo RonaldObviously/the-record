@@ -137,6 +137,6 @@ Think of this as the "mission control interface" for a system whose "engine" cou
 
 ---
 
-📄 **License**: MIT  
+  
 🔗 **Based on**: "The Record" whitepaper technical analysis  
 ✨ **Built with**: GitHub Spark Template
