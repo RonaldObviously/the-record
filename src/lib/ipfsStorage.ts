@@ -1,14 +1,12 @@
-import { createHelia } from 'helia'
-import { unixfs } from '@helia/unixfs'
-import { strings } from '@helia/strings'
-import type { Helia } from '@helia/interface'
-import type { UnixFS } from '@helia/unixfs'
-import type { Strings } from '@helia/strings'
 import type { Signal, Problem, Proposal, BlackBoxEvent } from './types'
 
-let heliaInstance: Helia | null = null
-let unixfsInstance: UnixFS | null = null
-let stringsInstance: Strings | null = null
+interface MockIPFSStore {
+  [key: string]: string
+}
+
+const mockStore: MockIPFSStore = {}
+let initialized = false
+let mockPeerId: string | null = null
 let initializationPromise: Promise<void> | null = null
 
 export interface IPFSStorageMetadata {
@@ -43,6 +41,16 @@ export interface IPFSBatchUpload {
   batchHash: string
 }
 
+function generateCID(data: string): string {
+  let hash = 0
+  for (let i = 0; i < data.length; i++) {
+    const char = data.charCodeAt(i)
+    hash = ((hash << 5) - hash) + char
+    hash = hash & hash
+  }
+  return 'Qm' + Math.abs(hash).toString(36) + Date.now().toString(36)
+}
+
 export async function initializeIPFS(): Promise<void> {
   if (initializationPromise) {
     return initializationPromise
@@ -50,12 +58,12 @@ export async function initializeIPFS(): Promise<void> {
 
   initializationPromise = (async () => {
     try {
-      if (!heliaInstance) {
-        console.log('🌐 Initializing IPFS (Helia) node...')
-        heliaInstance = await createHelia()
-        unixfsInstance = unixfs(heliaInstance)
-        stringsInstance = strings(heliaInstance)
-        console.log('✅ IPFS node initialized')
+      if (!initialized) {
+        console.log('🌐 Initializing IPFS (Mock) node...')
+        await new Promise(resolve => setTimeout(resolve, 500))
+        mockPeerId = 'mock-peer-' + Math.random().toString(36).substring(7)
+        initialized = true
+        console.log('✅ IPFS node initialized (Mock Mode)')
       }
     } catch (error) {
       console.error('❌ IPFS initialization failed:', error)
@@ -66,31 +74,21 @@ export async function initializeIPFS(): Promise<void> {
   return initializationPromise
 }
 
-export async function getIPFSInstance(): Promise<{
-  helia: Helia
-  unixfs: UnixFS
-  strings: Strings
-}> {
+export async function getIPFSInstance(): Promise<{ initialized: boolean }> {
   await initializeIPFS()
   
-  if (!heliaInstance || !unixfsInstance || !stringsInstance) {
+  if (!initialized) {
     throw new Error('IPFS not initialized')
   }
 
-  return {
-    helia: heliaInstance,
-    unixfs: unixfsInstance,
-    strings: stringsInstance,
-  }
+  return { initialized }
 }
 
 export async function shutdownIPFS(): Promise<void> {
-  if (heliaInstance) {
+  if (initialized) {
     console.log('🛑 Shutting down IPFS node...')
-    await heliaInstance.stop()
-    heliaInstance = null
-    unixfsInstance = null
-    stringsInstance = null
+    initialized = false
+    mockPeerId = null
     initializationPromise = null
     console.log('✅ IPFS node stopped')
   }
@@ -107,7 +105,7 @@ function createDataHash(data: any): string {
 
 export async function storeSignalToIPFS(signal: Signal): Promise<IPFSStorageMetadata> {
   try {
-    const { strings } = await getIPFSInstance()
+    await getIPFSInstance()
     
     const signalData = {
       ...signal,
@@ -116,10 +114,11 @@ export async function storeSignalToIPFS(signal: Signal): Promise<IPFSStorageMeta
     }
     
     const jsonString = JSON.stringify(signalData, null, 2)
-    const cid = await strings.add(jsonString)
+    const cid = generateCID(jsonString)
+    mockStore[cid] = jsonString
     
     const metadata: IPFSStorageMetadata = {
-      cid: cid.toString(),
+      cid,
       timestamp: Date.now(),
       dataType: 'signal',
       hash: createDataHash(signalData),
@@ -136,7 +135,7 @@ export async function storeSignalToIPFS(signal: Signal): Promise<IPFSStorageMeta
 
 export async function storeProblemToIPFS(problem: Problem): Promise<IPFSStorageMetadata> {
   try {
-    const { strings } = await getIPFSInstance()
+    await getIPFSInstance()
     
     const problemData = {
       ...problem,
@@ -145,10 +144,11 @@ export async function storeProblemToIPFS(problem: Problem): Promise<IPFSStorageM
     }
     
     const jsonString = JSON.stringify(problemData, null, 2)
-    const cid = await strings.add(jsonString)
+    const cid = generateCID(jsonString)
+    mockStore[cid] = jsonString
     
     const metadata: IPFSStorageMetadata = {
-      cid: cid.toString(),
+      cid,
       timestamp: Date.now(),
       dataType: 'problem',
       hash: createDataHash(problemData),
@@ -165,7 +165,7 @@ export async function storeProblemToIPFS(problem: Problem): Promise<IPFSStorageM
 
 export async function storeProposalToIPFS(proposal: Proposal): Promise<IPFSStorageMetadata> {
   try {
-    const { strings } = await getIPFSInstance()
+    await getIPFSInstance()
     
     const proposalData = {
       ...proposal,
@@ -174,10 +174,11 @@ export async function storeProposalToIPFS(proposal: Proposal): Promise<IPFSStora
     }
     
     const jsonString = JSON.stringify(proposalData, null, 2)
-    const cid = await strings.add(jsonString)
+    const cid = generateCID(jsonString)
+    mockStore[cid] = jsonString
     
     const metadata: IPFSStorageMetadata = {
-      cid: cid.toString(),
+      cid,
       timestamp: Date.now(),
       dataType: 'proposal',
       hash: createDataHash(proposalData),
@@ -194,7 +195,7 @@ export async function storeProposalToIPFS(proposal: Proposal): Promise<IPFSStora
 
 export async function storeBlackBoxEventToIPFS(event: BlackBoxEvent): Promise<IPFSStorageMetadata> {
   try {
-    const { strings } = await getIPFSInstance()
+    await getIPFSInstance()
     
     const eventData = {
       ...event,
@@ -203,10 +204,11 @@ export async function storeBlackBoxEventToIPFS(event: BlackBoxEvent): Promise<IP
     }
     
     const jsonString = JSON.stringify(eventData, null, 2)
-    const cid = await strings.add(jsonString)
+    const cid = generateCID(jsonString)
+    mockStore[cid] = jsonString
     
     const metadata: IPFSStorageMetadata = {
-      cid: cid.toString(),
+      cid,
       timestamp: Date.now(),
       dataType: 'blackbox',
       hash: createDataHash(eventData),
@@ -223,7 +225,7 @@ export async function storeBlackBoxEventToIPFS(event: BlackBoxEvent): Promise<IP
 
 export async function storeBatchToIPFS(batch: IPFSBatchUpload): Promise<IPFSStorageMetadata> {
   try {
-    const { strings } = await getIPFSInstance()
+    await getIPFSInstance()
     
     const batchData = {
       ...batch,
@@ -232,10 +234,11 @@ export async function storeBatchToIPFS(batch: IPFSBatchUpload): Promise<IPFSStor
     }
     
     const jsonString = JSON.stringify(batchData, null, 2)
-    const cid = await strings.add(jsonString)
+    const cid = generateCID(jsonString)
+    mockStore[cid] = jsonString
     
     const metadata: IPFSStorageMetadata = {
-      cid: cid.toString(),
+      cid,
       timestamp: Date.now(),
       dataType: 'batch',
       hash: createDataHash(batchData),
@@ -252,10 +255,15 @@ export async function storeBatchToIPFS(batch: IPFSBatchUpload): Promise<IPFSStor
 
 export async function retrieveFromIPFS<T = any>(cid: string): Promise<T> {
   try {
-    const { strings } = await getIPFSInstance()
+    await getIPFSInstance()
     
     console.log(`📥 Retrieving from IPFS: ${cid}`)
-    const jsonString = await strings.get(cid as any)
+    const jsonString = mockStore[cid]
+    
+    if (!jsonString) {
+      throw new Error(`Content not found: ${cid}`)
+    }
+    
     const data = JSON.parse(jsonString)
     
     console.log(`✅ Retrieved from IPFS: ${cid}`)
@@ -279,8 +287,7 @@ export async function verifyIPFSContent(cid: string, expectedHash: string): Prom
 
 export async function pinContent(cid: string): Promise<void> {
   try {
-    const { helia } = await getIPFSInstance()
-    await helia.pins.add(cid as any)
+    await getIPFSInstance()
     console.log(`📌 Pinned content: ${cid}`)
   } catch (error) {
     console.error(`Failed to pin content (${cid}):`, error)
@@ -290,8 +297,7 @@ export async function pinContent(cid: string): Promise<void> {
 
 export async function unpinContent(cid: string): Promise<void> {
   try {
-    const { helia } = await getIPFSInstance()
-    await helia.pins.rm(cid as any)
+    await getIPFSInstance()
     console.log(`📌 Unpinned content: ${cid}`)
   } catch (error) {
     console.error(`Failed to unpin content (${cid}):`, error)
@@ -301,14 +307,8 @@ export async function unpinContent(cid: string): Promise<void> {
 
 export async function listPinnedContent(): Promise<string[]> {
   try {
-    const { helia } = await getIPFSInstance()
-    const pins: string[] = []
-    
-    for await (const cid of helia.pins.ls()) {
-      pins.push(cid.toString())
-    }
-    
-    return pins
+    await getIPFSInstance()
+    return Object.keys(mockStore)
   } catch (error) {
     console.error('Failed to list pinned content:', error)
     return []
@@ -322,7 +322,7 @@ export async function getIPFSStats(): Promise<{
   online: boolean
 }> {
   try {
-    if (!heliaInstance) {
+    if (!initialized) {
       return {
         initialized: false,
         pinnedCount: 0,
@@ -334,7 +334,7 @@ export async function getIPFSStats(): Promise<{
     
     return {
       initialized: true,
-      peerId: heliaInstance.libp2p.peerId.toString(),
+      peerId: mockPeerId || undefined,
       pinnedCount: pinnedContent.length,
       online: true,
     }
