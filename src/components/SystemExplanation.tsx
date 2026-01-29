@@ -52,14 +52,14 @@ export function SystemExplanation() {
 
         <div className="flex-1 overflow-y-auto px-6 pr-4">
           <Tabs defaultValue="intro" className="w-full pb-4">
-          <TabsList className="grid w-full grid-cols-7">
-            <TabsTrigger value="intro">Overview</TabsTrigger>
-            <TabsTrigger value="how">How It Works</TabsTrigger>
-            <TabsTrigger value="visual">Visual Flow</TabsTrigger>
-            <TabsTrigger value="flow">Signal Flow</TabsTrigger>
-            <TabsTrigger value="demo">Live Demo</TabsTrigger>
-            <TabsTrigger value="why">Why Different</TabsTrigger>
-            <TabsTrigger value="layers">4 Layers</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-4 gap-2 h-auto p-2">
+            <TabsTrigger value="intro" className="text-xs">Overview</TabsTrigger>
+            <TabsTrigger value="how" className="text-xs">How</TabsTrigger>
+            <TabsTrigger value="visual" className="text-xs">Visual</TabsTrigger>
+            <TabsTrigger value="flow" className="text-xs">Flow</TabsTrigger>
+            <TabsTrigger value="demo" className="text-xs">Demo</TabsTrigger>
+            <TabsTrigger value="why" className="text-xs">Why</TabsTrigger>
+            <TabsTrigger value="layers" className="text-xs">Layers</TabsTrigger>
           </TabsList>
 
           <TabsContent value="intro" className="space-y-6 mt-6">
