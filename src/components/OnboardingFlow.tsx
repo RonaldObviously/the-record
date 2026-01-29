@@ -208,12 +208,18 @@ export function OnboardingFlow({ open, onComplete }: OnboardingFlowProps) {
             </div>
             <div className="space-y-3">
               <div className="bg-accent/10 border border-accent/30 p-4 rounded-lg space-y-2">
-                <p className="text-sm font-semibold text-foreground">Why cryptographic keys?</p>
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-semibold text-foreground">Why cryptographic keys?</p>
+                  <Badge variant="outline" className="text-xs">DEMO: Keys stored locally only</Badge>
+                </div>
                 <p className="text-xs text-muted-foreground leading-relaxed">
                   Unlike traditional systems where a central authority controls your identity, THE RECORD
                   gives you <strong>sovereign ownership</strong>. Your private key proves you're you
                   without revealing personal information. No one can take it, forge it, or use it without
                   your permission.
+                </p>
+                <p className="text-xs text-accent">
+                  ℹ️ In this demo, keys are generated but only stored in your browser's local storage.
                 </p>
               </div>
               <p className="text-sm text-muted-foreground text-center">
@@ -247,12 +253,18 @@ export function OnboardingFlow({ open, onComplete }: OnboardingFlowProps) {
             </div>
             <div className="space-y-3">
               <div className="bg-accent/10 border border-accent/30 p-4 rounded-lg space-y-2">
-                <p className="text-sm font-semibold text-foreground">Why email verification?</p>
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-semibold text-foreground">Why email verification?</p>
+                  <Badge variant="outline" className="text-xs">DEMO: No code sent</Badge>
+                </div>
                 <p className="text-xs text-muted-foreground leading-relaxed">
                   We prevent <strong>Sybil attacks</strong> (one person creating 1000 fake accounts) by
                   requiring multiple independent signals of humanity. Email is one signal. Your email is{' '}
                   <strong>never public</strong> and never used for marketing. It only increases your
                   humanity score.
+                </p>
+                <p className="text-xs text-accent">
+                  ℹ️ In this demo, clicking "Verify" simulates the process without sending a verification code.
                 </p>
               </div>
               <Label htmlFor="email">Email Address</Label>
@@ -284,12 +296,18 @@ export function OnboardingFlow({ open, onComplete }: OnboardingFlowProps) {
             </div>
             <div className="space-y-3">
               <div className="bg-accent/10 border border-accent/30 p-4 rounded-lg space-y-2">
-                <p className="text-sm font-semibold text-foreground">Why location?</p>
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-semibold text-foreground">Why location?</p>
+                  <Badge variant="outline" className="text-xs">DEMO: Location stays local</Badge>
+                </div>
                 <p className="text-xs text-muted-foreground leading-relaxed">
                   THE RECORD uses <strong>H3 hexagonal geospatial indexing</strong>. Instead of storing
                   your exact GPS coordinates (37.7749°, -122.4194°), we convert it to a hexagonal cell ID
                   that covers ~500 meters. This proves you're in an area <strong>without revealing your
                   exact address</strong>. You can report local problems safely.
+                </p>
+                <p className="text-xs text-accent">
+                  ℹ️ In this demo, your location is only stored in your browser and never transmitted anywhere.
                 </p>
               </div>
               <p className="text-sm text-muted-foreground text-center">

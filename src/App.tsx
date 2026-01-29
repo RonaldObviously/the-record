@@ -3,6 +3,7 @@ import { useKV } from '@github/spark/hooks'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 import { BubbleMap } from '@/components/BubbleMap'
 import { ProblemList } from '@/components/ProblemList'
 import { ProposalList } from '@/components/ProposalList'
@@ -321,10 +322,17 @@ function App() {
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="cursor-pointer" onClick={() => setCurrentView('home')}>
-              <h1 className="text-2xl font-semibold text-foreground font-mono">THE RECORD</h1>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                Sovereign Coordination Engine
-              </p>
+              <div className="flex items-center gap-3">
+                <div>
+                  <h1 className="text-2xl font-semibold text-foreground font-mono">THE RECORD</h1>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Sovereign Coordination Engine
+                  </p>
+                </div>
+                <Badge variant="outline" className="bg-accent/10 text-accent border-accent/30">
+                  DEMO MODE
+                </Badge>
+              </div>
             </div>
             
             <div className="flex items-center gap-2">

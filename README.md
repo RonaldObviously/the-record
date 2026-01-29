@@ -1,10 +1,14 @@
-# The Record — Transparent Collective Decision System
+# The Record — Interactive Conceptual Demo
 
-A browser-based implementation of a 4-layer anti-group-failure governance architecture that enables communities to identify problems, allocate resources, track execution, and validate predictions through radical transparency.
+> ⚠️ **THIS IS AN EDUCATIONAL DEMONSTRATION, NOT A PRODUCTION SYSTEM**  
+> All verification, storage, and network operations are simulated locally in your browser.  
+> No data leaves your device. See [DEMO_DISCLAIMER.md](DEMO_DISCLAIMER.md) for complete details.
+
+A browser-based prototype exploring a 4-layer anti-group-failure governance architecture that demonstrates how communities could identify problems, allocate resources, track execution, and validate predictions through radical transparency.
 
 ## 🎯 What Is This?
 
-The Record is a proof-of-concept demonstrating how collective decision-making can be protected from common failure modes:
+The Record is an **interactive conceptual demo** showing how collective decision-making could be protected from common failure modes:
 - **Groupthink**: Eliminated through anonymous input aggregation (L1)
 - **Single-authority bias**: Prevented by distributed constraint validation (L2)
 - **Unaccountable predictions**: Tracked and scored against real outcomes (L3)
@@ -68,24 +72,54 @@ On first launch, the system automatically seeds with demonstration data showing 
 
 The interface evokes clinical precision and institutional trust — like air traffic control meets research lab. Dark theme with technical typography (IBM Plex Sans + JetBrains Mono), data-dense layouts, and purposeful animations that show causality and state transitions.
 
-## 📊 What's Working vs. Theoretical
+## 📊 What's Real vs. Simulated
 
-**✅ Fully Implemented**:
+### ✅ FULLY FUNCTIONAL (Real Code)
 - Complete UI/UX for all 4 layers
-- Data persistence and state management
-- Problem submission and aggregation
-- Proposal creation with predictions
-- Validation result display
+- Data persistence (browser local storage)
+- Signal clustering and aggregation
+- Geographic H3 mesh system
+- Satellite map visualization
+- Influence calculation (zero-sum math)
 - Black Box event logging
-- Meta-layer alert system
-- Bubble hierarchy navigation
+- Professional verification interface
 
-**⚠️ Simplified/Simulated**:
-- Validation results (randomly generated, not actual constraint checking)
-- Prediction accuracy scoring (simulated based on random outcomes)
-- Ring signatures for anonymity (architectural placeholder)
-- Byzantine consensus (event structure present, full protocol not implemented)
-- Multi-network storage (IPFS/Filecoin/Arweave integration points designed but not connected)
+### ⚠️ SIMULATED (Demo Mode - Does NOT Perform Real Operations)
+
+**Identity & Verification**:
+- Email/phone verification (shows UI, doesn't send codes)
+- Location services (doesn't transmit your actual location)
+- Professional credentials (files stay local, no upload)
+- Humanity scoring (demo logic only)
+
+**Data Storage**:
+- IPFS/Filecoin/Arweave (architectural design, not connected)
+- Blockchain ledger (hashes computed, not published)
+- Distributed storage (everything in browser only)
+
+**Cryptography**:
+- Ring signatures (uses standard crypto, not production protocol)
+- Byzantine consensus (event structure, not full BFT)
+- Zero-knowledge proofs (conceptual)
+
+**Network**:
+- Validator quorum (simulated responses)
+- Professional review (no actual reviewers)
+- P2P networking (runs locally only)
+
+**Economic Systems**:
+- Influence bonding (correct math, no real value)
+- Reputation slashing (simulated)
+- Treasury (conceptual accounting)
+
+### 🔒 Privacy in Demo Mode
+- ❌ Does NOT send location to any server
+- ❌ Does NOT upload files anywhere
+- ❌ Does NOT verify email/phone (no codes sent)
+- ❌ Does NOT connect to blockchain networks
+- ❌ Does NOT share data with anyone
+- ✅ Stores everything in browser local storage only
+- ✅ Simulates the full user experience safely
 
 **📋 Production Requirements** (per original technical analysis):
 - Real Byzantine Fault Tolerant consensus (use Tendermint or implement full PBFT)

@@ -131,6 +131,7 @@ export function ProfessionalVerificationDialog({
             <DialogTitle className="flex items-center gap-2">
               <Certificate size={24} className="text-accent" />
               Professional Verification
+              <Badge variant="outline" className="ml-auto text-xs">DEMO: Files stay local</Badge>
             </DialogTitle>
             <DialogDescription className="flex items-center justify-between gap-4">
               <span>Connect as a verified professional to contribute with enhanced credibility</span>

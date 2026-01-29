@@ -33,7 +33,12 @@ export function WelcomeDialog({ open, onGetStarted }: WelcomeDialogProps) {
       <DialogContent className="max-w-3xl h-[90vh] p-0 gap-0 flex flex-col overflow-hidden">
         <div className="px-6 pt-6 pb-4 shrink-0">
           <DialogHeader>
-            <DialogTitle className="font-mono text-3xl">Welcome to THE RECORD</DialogTitle>
+            <DialogTitle className="font-mono text-3xl flex items-center gap-3">
+              Welcome to THE RECORD
+              <Badge variant="outline" className="text-sm bg-accent/10 text-accent border-accent/30">
+                INTERACTIVE DEMO
+              </Badge>
+            </DialogTitle>
             <DialogDescription className="text-base">
               A Sovereign Coordination Engine for Transparent Decision-Making
             </DialogDescription>
@@ -42,6 +47,25 @@ export function WelcomeDialog({ open, onGetStarted }: WelcomeDialogProps) {
 
         <ScrollArea className="flex-1 overflow-auto">
           <div className="space-y-6 pb-6 px-6 pr-4">
+          <Card className="bg-accent/10 border-accent/30">
+            <CardContent className="pt-4">
+              <div className="flex items-start gap-3">
+                <ShieldCheck size={20} className="text-accent flex-shrink-0 mt-0.5" />
+                <div className="space-y-2">
+                  <p className="text-sm font-semibold">Important: This is an Interactive Demo</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    This demonstration shows what The Record system could be. All verification, storage, 
+                    and network operations are <strong>simulated locally in your browser</strong>. No data 
+                    leaves your device. No real verification codes are sent. Files are not uploaded anywhere.
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    This prototype demonstrates the architecture, user experience, and theoretical mechanics 
+                    of a decentralized coordination system.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
           <div className="bg-accent/10 border border-accent/30 p-4 rounded-lg">
             <p className="text-sm leading-relaxed">
               THE RECORD is <strong>not a government, voting system, or social network</strong>.
