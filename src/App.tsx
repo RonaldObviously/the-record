@@ -433,7 +433,7 @@ function App() {
                   </Card>
 
                   <Card className="p-6 mt-6">
-                    <Tabs value={currentLayer} onValueChange={(v) => setCurrentLayer(v as any)}>
+                    <Tabs value={currentLayer} onValueChange={(v) => setCurrentLayer(v as any)} className="w-full">
                       <div className="flex items-center justify-between mb-6">
                         <TabsList>
                           <TabsTrigger value="L1">L1: Signals</TabsTrigger>
