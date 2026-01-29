@@ -297,6 +297,56 @@ function App() {
     }
   }, [ipfs.autoBackupEnabled, ipfs.state.initialized, safeSignals.length, safeProblems.length, safeProposals.length, safeBlackBox.length])
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const safeClusters = Array.isArray(clusters) ? clusters : []
+      
+      if (safeClusters.length === 0) return
+
+      const result = processHierarchicalClustering(safeClusters)
+      
+      if (result.promotionEvents.length > 0) {
+        const newClusters = [
+          ...safeClusters,
+          ...result.l2Clusters,
+          ...result.l3Clusters,
+          ...result.l4Clusters,
+        ]
+        
+        setClusters(newClusters)
+        
+        result.promotionEvents.forEach(event => {
+          const blackBoxEvent: BlackBoxEvent = {
+            id: `event-${Date.now()}-${Math.random()}`,
+            type: 'cluster-promoted',
+            timestamp: event.timestamp,
+            data: {
+              fromLevel: event.fromLevel,
+              toLevel: event.toLevel,
+              clusterId: event.clusterId,
+              childClusterIds: event.childClusterIds,
+              weight: event.weight,
+              reason: event.reason,
+            },
+            hash: `hash-${Date.now()}`,
+            previousHash: safeBlackBox[safeBlackBox.length - 1]?.hash || 'genesis',
+          }
+          setBlackBox((current) => [...(current || []), blackBoxEvent])
+        })
+        
+        const highestLevel = Math.max(...result.promotionEvents.map(e => e.toLevel))
+        toast.success(
+          `Auto-clustering: ${result.promotionEvents.length} cluster${
+            result.promotionEvents.length > 1 ? 's' : ''
+          } promoted to L${highestLevel}`,
+          { duration: 5000 }
+        )
+      }
+    }, 30000)
+
+    return () => clearInterval(interval)
+  }, [safeClusters.length, safeBlackBox.length])
+
   const criticalAlerts = safeMetaAlerts.filter(a => a.severity === 'critical' || a.severity === 'high')
 
   return (
