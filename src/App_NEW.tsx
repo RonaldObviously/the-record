@@ -38,7 +38,7 @@ import type { UserAccount } from '@/lib/auth'
 import { canSubmitSignals } from '@/lib/auth'
 import type { Validator, CredentialValidationRequest } from '@/lib/professionalValidatorQuorum'
 import { generateMockValidatorNetwork, generateMockValidationRequests } from '@/lib/mockValidatorData'
-import { Plus, User, MapPin, Info, ChartBar, House } from '@phosphor-icons/react'
+import { Plus, User, MapPin, Info, ChartBar, ListBullets, House } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 import { useIPFSStorage } from '@/hooks/use-ipfs-storage'
 
