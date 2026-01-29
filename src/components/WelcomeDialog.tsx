@@ -30,8 +30,8 @@ interface WelcomeDialogProps {
 export function WelcomeDialog({ open, onGetStarted }: WelcomeDialogProps) {
   return (
     <Dialog open={open} onOpenChange={() => {}}>
-      <DialogContent className="max-w-3xl h-[85vh] p-0 gap-0">
-        <div className="px-6 pt-6 pb-4">
+      <DialogContent className="max-w-3xl max-h-[90vh] p-0 gap-0 flex flex-col">
+        <div className="px-6 pt-6 pb-4 shrink-0">
           <DialogHeader>
             <DialogTitle className="font-mono text-3xl">Welcome to THE RECORD</DialogTitle>
             <DialogDescription className="text-base">
@@ -40,8 +40,8 @@ export function WelcomeDialog({ open, onGetStarted }: WelcomeDialogProps) {
           </DialogHeader>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-6 pr-4">
-          <div className="space-y-6 pb-4">
+        <ScrollArea className="flex-1">
+          <div className="space-y-6 pb-6 px-6 pr-10">
           <div className="bg-accent/10 border border-accent/30 p-4 rounded-lg">
             <p className="text-sm leading-relaxed">
               THE RECORD is <strong>not a government, voting system, or social network</strong>.
@@ -179,9 +179,9 @@ export function WelcomeDialog({ open, onGetStarted }: WelcomeDialogProps) {
             </div>
           </div>
           </div>
-        </div>
+        </ScrollArea>
 
-        <div className="px-6 pb-6 pt-4 border-t">
+        <div className="px-6 pb-6 pt-4 border-t shrink-0">
           <div className="flex justify-end gap-3">
             <Button onClick={onGetStarted} size="lg" className="w-full md:w-auto">
               <ShieldCheck size={18} className="mr-2" />

@@ -14,14 +14,14 @@ export function InfluenceVsMoneyBreakdown() {
           Influence vs Money
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-5xl h-[85vh] p-0 gap-0">
-        <div className="px-6 pt-6 pb-4">
+      <DialogContent className="max-w-5xl max-h-[90vh] p-0 gap-0 flex flex-col">
+        <div className="px-6 pt-6 pb-4 shrink-0">
           <DialogHeader>
             <DialogTitle className="text-2xl font-mono">The Critical Distinction: Ψ vs $</DialogTitle>
           </DialogHeader>
         </div>
-        <div className="flex-1 overflow-y-auto px-6 pr-4">
-          <div className="pb-6">
+        <ScrollArea className="flex-1">
+          <div className="pb-6 px-6 pr-10">
           <div className="space-y-6">
             <Card className="p-6 border-accent bg-accent/5">
               <div className="flex items-start gap-4">
@@ -514,7 +514,7 @@ export function InfluenceVsMoneyBreakdown() {
             </Card>
           </div>
           </div>
-        </div>
+        </ScrollArea>
       </DialogContent>
     </Dialog>
   )
