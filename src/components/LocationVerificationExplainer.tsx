@@ -14,18 +14,21 @@ interface LocationVerificationExplainerProps {
 export function LocationVerificationExplainer({ open, onOpenChange, currentProof }: LocationVerificationExplainerProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <ShieldCheck size={24} className="text-accent" />
-            Why THE RECORD Verifies Your Location
-          </DialogTitle>
-          <DialogDescription>
-            Understanding our multi-layer anti-manipulation system
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className="max-w-3xl h-[90vh] p-0 gap-0 flex flex-col overflow-hidden">
+        <div className="px-6 pt-6 pb-4 shrink-0">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <ShieldCheck size={24} className="text-accent" />
+              Why THE RECORD Verifies Your Location
+            </DialogTitle>
+            <DialogDescription>
+              Understanding our multi-layer anti-manipulation system
+            </DialogDescription>
+          </DialogHeader>
+        </div>
 
-        <div className="space-y-6 mt-4">
+        <div className="flex-1 overflow-y-auto px-6 pr-4 pb-6">
+        <div className="space-y-6">
           <Card className="p-4 bg-muted/30">
             <h3 className="font-semibold mb-2 flex items-center gap-2">
               <Globe size={20} />
@@ -206,6 +209,7 @@ export function LocationVerificationExplainer({ open, onOpenChange, currentProof
               Close
             </Button>
           </div>
+        </div>
         </div>
       </DialogContent>
     </Dialog>

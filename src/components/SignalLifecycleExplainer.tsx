@@ -25,7 +25,7 @@ export function SignalLifecycleExplainer() {
           Signal Lifecycle
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-5xl max-h-[90vh] p-0 gap-0 flex flex-col">
+      <DialogContent className="max-w-5xl h-[90vh] p-0 gap-0 flex flex-col overflow-hidden">
         <div className="px-6 pt-6 pb-4 flex-shrink-0">
           <DialogHeader>
             <DialogTitle className="font-mono text-2xl">Signal to Problem Lifecycle</DialogTitle>
@@ -35,7 +35,7 @@ export function SignalLifecycleExplainer() {
           </DialogHeader>
         </div>
 
-        <ScrollArea className="flex-1 px-6 pb-6">
+        <div className="flex-1 overflow-y-auto px-6 pr-4 pb-6">
           <Tabs defaultValue="visual" className="w-full">
             <TabsList className="grid w-full grid-cols-2 mb-6">
               <TabsTrigger value="visual">Interactive Visual</TabsTrigger>
@@ -50,7 +50,7 @@ export function SignalLifecycleExplainer() {
               <SignalFlowDiagram />
             </TabsContent>
           </Tabs>
-        </ScrollArea>
+        </div>
       </DialogContent>
     </Dialog>
   )

@@ -14,11 +14,13 @@ export function ClusteringExplainer() {
           How Clustering Works
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-4xl max-h-[90vh]">
-        <DialogHeader>
-          <DialogTitle>Signal Clustering & Global Issue Detection</DialogTitle>
-        </DialogHeader>
-        <ScrollArea className="max-h-[calc(90vh-8rem)] pr-4">
+      <DialogContent className="max-w-4xl h-[90vh] p-0 gap-0 flex flex-col overflow-hidden">
+        <div className="px-6 pt-6 pb-4 shrink-0">
+          <DialogHeader>
+            <DialogTitle>Signal Clustering & Global Issue Detection</DialogTitle>
+          </DialogHeader>
+        </div>
+        <div className="flex-1 overflow-y-auto px-6 pr-4 pb-6">
           <div className="space-y-6">
             <div>
               <h3 className="font-semibold text-lg mb-3">The Clustering Hierarchy</h3>
@@ -181,7 +183,7 @@ export function ClusteringExplainer() {
               </p>
             </div>
           </div>
-        </ScrollArea>
+        </div>
       </DialogContent>
     </Dialog>
   )

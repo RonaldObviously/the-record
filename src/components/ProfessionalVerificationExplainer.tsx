@@ -15,7 +15,7 @@ export function ProfessionalVerificationExplainer() {
           How Professional Verification Works
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-4xl max-h-[90vh] p-0 gap-0 flex flex-col">
+      <DialogContent className="max-w-4xl h-[90vh] p-0 gap-0 flex flex-col overflow-hidden">
         <div className="px-6 pt-6 pb-4 shrink-0">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
@@ -28,8 +28,8 @@ export function ProfessionalVerificationExplainer() {
           </DialogHeader>
         </div>
 
-        <ScrollArea className="flex-1">
-          <div className="space-y-6 pb-6 px-6 pr-10">
+        <ScrollArea className="flex-1 overflow-auto">
+          <div className="space-y-6 pb-6 px-6 pr-4">
             <Card className="p-4 bg-accent/10 border-accent/30">
               <div className="flex items-start gap-3">
                 <Warning size={24} className="text-accent flex-shrink-0 mt-0.5" />
