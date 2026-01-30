@@ -57,7 +57,7 @@
         "cmdk": "^1.1.1",
         "d3": "^7.9.0",
         "datastore-core": "^11.0.2",
-        "date-fns": "^3.6.0",
+        "date-fns": "^4.1.0",
         "embla-carousel-react": "^8.5.2",
         "framer-motion": "^12.6.2",
         "h3-js": "^4.4.0",
